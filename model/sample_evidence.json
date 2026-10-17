@@ -1,0 +1,801 @@
+[
+  {
+    "evidence_id": "ev-sess-demo-lookalike-base-1",
+    "actor": "U_8dfdc888a962",
+    "session_id": "sess-demo-lookalike-base",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.965,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9612,
+    "severity": "LOW",
+    "indicators": [],
+    "top_events": [
+      "evt-0000001"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-lookalike-base-2",
+    "actor": "U_8dfdc888a962",
+    "session_id": "sess-demo-lookalike-base",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9617,
+    "severity": "LOW",
+    "indicators": [],
+    "top_events": [
+      "evt-0000001",
+      "evt-0000002"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-lookalike-base-3",
+    "actor": "U_8dfdc888a962",
+    "session_id": "sess-demo-lookalike-base",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9653,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9616,
+    "severity": "LOW",
+    "indicators": [],
+    "top_events": [
+      "evt-0000001",
+      "evt-0000003",
+      "evt-0000002"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-lookalike-base-4",
+    "actor": "U_8dfdc888a962",
+    "session_id": "sess-demo-lookalike-base",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9616,
+    "severity": "LOW",
+    "indicators": [],
+    "top_events": [
+      "evt-0000001",
+      "evt-0000004",
+      "evt-0000003",
+      "evt-0000002"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-lookalike-base-5",
+    "actor": "U_8dfdc888a962",
+    "session_id": "sess-demo-lookalike-base",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9616,
+    "severity": "LOW",
+    "indicators": [],
+    "top_events": [
+      "evt-0000001",
+      "evt-0000005",
+      "evt-0000004",
+      "evt-0000003",
+      "evt-0000002"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-lookalike-base-6",
+    "actor": "U_8dfdc888a962",
+    "session_id": "sess-demo-lookalike-base",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9618,
+    "severity": "LOW",
+    "indicators": [],
+    "top_events": [
+      "evt-0000001",
+      "evt-0000006",
+      "evt-0000005",
+      "evt-0000004",
+      "evt-0000003"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-lookalike-base-7",
+    "actor": "U_8dfdc888a962",
+    "session_id": "sess-demo-lookalike-base",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9617,
+    "severity": "LOW",
+    "indicators": [],
+    "top_events": [
+      "evt-0000001",
+      "evt-0000007",
+      "evt-0000006",
+      "evt-0000005",
+      "evt-0000004"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-lookalike-base-8",
+    "actor": "U_8dfdc888a962",
+    "session_id": "sess-demo-lookalike-base",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9617,
+    "severity": "LOW",
+    "indicators": [],
+    "top_events": [
+      "evt-0000001",
+      "evt-0000008",
+      "evt-0000007",
+      "evt-0000006",
+      "evt-0000005"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-lookalike-base-9",
+    "actor": "U_8dfdc888a962",
+    "session_id": "sess-demo-lookalike-base",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9618,
+    "severity": "LOW",
+    "indicators": [],
+    "top_events": [
+      "evt-0000001",
+      "evt-0000009",
+      "evt-0000008",
+      "evt-0000007",
+      "evt-0000006"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-base-1",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack-base",
+    "current_stage": "INITIAL_ACCESS",
+    "stage_confidence": 0.8129,
+    "next_stage": "CREDENTIAL_ACCESS",
+    "next_confidence": 0.8056,
+    "severity": "LOW",
+    "indicators": [],
+    "top_events": [
+      "evt-0000010"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-base-2",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack-base",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9617,
+    "severity": "LOW",
+    "indicators": [],
+    "top_events": [
+      "evt-0000011",
+      "evt-0000010"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-base-3",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack-base",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9644,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9598,
+    "severity": "LOW",
+    "indicators": [],
+    "top_events": [
+      "evt-0000012",
+      "evt-0000011",
+      "evt-0000010"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-base-4",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack-base",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9617,
+    "severity": "LOW",
+    "indicators": [],
+    "top_events": [
+      "evt-0000013",
+      "evt-0000012",
+      "evt-0000011",
+      "evt-0000010"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-base-5",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack-base",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9616,
+    "severity": "LOW",
+    "indicators": [],
+    "top_events": [
+      "evt-0000013",
+      "evt-0000014",
+      "evt-0000012",
+      "evt-0000011",
+      "evt-0000010"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-base-6",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack-base",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9616,
+    "severity": "LOW",
+    "indicators": [],
+    "top_events": [
+      "evt-0000013",
+      "evt-0000015",
+      "evt-0000014",
+      "evt-0000012",
+      "evt-0000011"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-base-7",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack-base",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9617,
+    "severity": "LOW",
+    "indicators": [],
+    "top_events": [
+      "evt-0000013",
+      "evt-0000016",
+      "evt-0000015",
+      "evt-0000014",
+      "evt-0000012"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-base-8",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack-base",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9617,
+    "severity": "LOW",
+    "indicators": [],
+    "top_events": [
+      "evt-0000013",
+      "evt-0000017",
+      "evt-0000016",
+      "evt-0000015",
+      "evt-0000014"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-lookalike-1",
+    "actor": "U_8dfdc888a962",
+    "session_id": "sess-demo-lookalike",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9617,
+    "severity": "LOW",
+    "indicators": [
+      "off_hours_activity"
+    ],
+    "top_events": [
+      "evt-0000018"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-1",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack",
+    "current_stage": "INITIAL_ACCESS",
+    "stage_confidence": 0.9023,
+    "next_stage": "CREDENTIAL_ACCESS",
+    "next_confidence": 0.8959,
+    "severity": "LOW",
+    "indicators": [
+      "new_origin",
+      "off_hours_activity"
+    ],
+    "top_events": [
+      "evt-0000019"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-2",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack",
+    "current_stage": "CREDENTIAL_ACCESS",
+    "stage_confidence": 0.9434,
+    "next_stage": "DISCOVERY",
+    "next_confidence": 0.9383,
+    "severity": "MEDIUM",
+    "indicators": [
+      "new_origin",
+      "off_hours_activity"
+    ],
+    "top_events": [
+      "evt-0000020",
+      "evt-0000019"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-3",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack",
+    "current_stage": "CREDENTIAL_ACCESS",
+    "stage_confidence": 0.9659,
+    "next_stage": "DISCOVERY",
+    "next_confidence": 0.9616,
+    "severity": "MEDIUM",
+    "indicators": [
+      "new_origin",
+      "off_hours_activity"
+    ],
+    "top_events": [
+      "evt-0000021",
+      "evt-0000020",
+      "evt-0000019"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-4",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack",
+    "current_stage": "CREDENTIAL_ACCESS",
+    "stage_confidence": 0.9659,
+    "next_stage": "DISCOVERY",
+    "next_confidence": 0.9616,
+    "severity": "MEDIUM",
+    "indicators": [
+      "mfa_failure_then_success",
+      "new_origin",
+      "off_hours_activity"
+    ],
+    "top_events": [
+      "evt-0000021",
+      "evt-0000020",
+      "evt-0000022",
+      "evt-0000019"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-5",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack",
+    "current_stage": "DISCOVERY",
+    "stage_confidence": 0.9659,
+    "next_stage": "PRIVILEGE_ESCALATION",
+    "next_confidence": 0.9615,
+    "severity": "MEDIUM",
+    "indicators": [
+      "mfa_failure_then_success",
+      "new_origin",
+      "off_hours_activity"
+    ],
+    "top_events": [
+      "evt-0000021",
+      "evt-0000020",
+      "evt-0000023",
+      "evt-0000022",
+      "evt-0000019"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-lookalike-2",
+    "actor": "U_8dfdc888a962",
+    "session_id": "sess-demo-lookalike",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9617,
+    "severity": "LOW",
+    "indicators": [
+      "off_hours_activity"
+    ],
+    "top_events": [
+      "evt-0000024",
+      "evt-0000018"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-6",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack",
+    "current_stage": "DISCOVERY",
+    "stage_confidence": 0.9659,
+    "next_stage": "PRIVILEGE_ESCALATION",
+    "next_confidence": 0.9616,
+    "severity": "MEDIUM",
+    "indicators": [
+      "discovery_sweep",
+      "mfa_failure_then_success",
+      "new_origin",
+      "off_hours_activity"
+    ],
+    "top_events": [
+      "evt-0000021",
+      "evt-0000020",
+      "evt-0000025",
+      "evt-0000023",
+      "evt-0000022"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-7",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack",
+    "current_stage": "DISCOVERY",
+    "stage_confidence": 0.9659,
+    "next_stage": "PRIVILEGE_ESCALATION",
+    "next_confidence": 0.9616,
+    "severity": "MEDIUM",
+    "indicators": [
+      "discovery_sweep",
+      "mfa_failure_then_success",
+      "new_origin",
+      "off_hours_activity"
+    ],
+    "top_events": [
+      "evt-0000021",
+      "evt-0000020",
+      "evt-0000026",
+      "evt-0000025",
+      "evt-0000023"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-lookalike-3",
+    "actor": "U_8dfdc888a962",
+    "session_id": "sess-demo-lookalike",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9653,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9544,
+    "severity": "LOW",
+    "indicators": [
+      "off_hours_activity",
+      "privilege_change"
+    ],
+    "top_events": [
+      "evt-0000027",
+      "evt-0000024",
+      "evt-0000018"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-8",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack",
+    "current_stage": "DISCOVERY",
+    "stage_confidence": 0.9659,
+    "next_stage": "PRIVILEGE_ESCALATION",
+    "next_confidence": 0.9616,
+    "severity": "MEDIUM",
+    "indicators": [
+      "discovery_sweep",
+      "mfa_failure_then_success",
+      "new_origin",
+      "off_hours_activity"
+    ],
+    "top_events": [
+      "evt-0000021",
+      "evt-0000020",
+      "evt-0000028",
+      "evt-0000026",
+      "evt-0000025"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-9",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack",
+    "current_stage": "PRIVILEGE_ESCALATION",
+    "stage_confidence": 0.9659,
+    "next_stage": "LATERAL_MOVEMENT",
+    "next_confidence": 0.9102,
+    "severity": "HIGH",
+    "indicators": [
+      "discovery_sweep",
+      "mfa_failure_then_success",
+      "new_origin",
+      "off_hours_activity",
+      "privilege_change"
+    ],
+    "top_events": [
+      "evt-0000029",
+      "evt-0000021",
+      "evt-0000020",
+      "evt-0000028",
+      "evt-0000026"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-lookalike-4",
+    "actor": "U_8dfdc888a962",
+    "session_id": "sess-demo-lookalike",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9618,
+    "severity": "LOW",
+    "indicators": [
+      "off_hours_activity",
+      "privilege_change"
+    ],
+    "top_events": [
+      "evt-0000027",
+      "evt-0000030",
+      "evt-0000024",
+      "evt-0000018"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-10",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack",
+    "current_stage": "LATERAL_MOVEMENT",
+    "stage_confidence": 0.9659,
+    "next_stage": "COLLECTION_EXFIL",
+    "next_confidence": 0.9617,
+    "severity": "HIGH",
+    "indicators": [
+      "discovery_sweep",
+      "mfa_failure_then_success",
+      "new_origin",
+      "off_hours_activity",
+      "privilege_change"
+    ],
+    "top_events": [
+      "evt-0000029",
+      "evt-0000021",
+      "evt-0000020",
+      "evt-0000028",
+      "evt-0000026"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-11",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack",
+    "current_stage": "COLLECTION_EXFIL",
+    "stage_confidence": 0.9659,
+    "next_stage": "COLLECTION_EXFIL",
+    "next_confidence": 0.8718,
+    "severity": "CRITICAL",
+    "indicators": [
+      "discovery_sweep",
+      "mfa_failure_then_success",
+      "new_origin",
+      "off_hours_activity",
+      "privilege_change",
+      "sensitive_access"
+    ],
+    "top_events": [
+      "evt-0000029",
+      "evt-0000032",
+      "evt-0000021",
+      "evt-0000020",
+      "evt-0000028"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-12",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack",
+    "current_stage": "COLLECTION_EXFIL",
+    "stage_confidence": 0.9663,
+    "next_stage": "COLLECTION_EXFIL",
+    "next_confidence": 0.853,
+    "severity": "CRITICAL",
+    "indicators": [
+      "discovery_sweep",
+      "mfa_failure_then_success",
+      "new_origin",
+      "off_hours_activity",
+      "privilege_change",
+      "sensitive_access"
+    ],
+    "top_events": [
+      "evt-0000029",
+      "evt-0000033",
+      "evt-0000032",
+      "evt-0000021",
+      "evt-0000028"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-lookalike-5",
+    "actor": "U_8dfdc888a962",
+    "session_id": "sess-demo-lookalike",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9619,
+    "severity": "LOW",
+    "indicators": [
+      "off_hours_activity",
+      "privilege_change"
+    ],
+    "top_events": [
+      "evt-0000027",
+      "evt-0000034",
+      "evt-0000030",
+      "evt-0000024",
+      "evt-0000018"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-lookalike-6",
+    "actor": "U_8dfdc888a962",
+    "session_id": "sess-demo-lookalike",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9618,
+    "severity": "LOW",
+    "indicators": [
+      "off_hours_activity",
+      "privilege_change"
+    ],
+    "top_events": [
+      "evt-0000027",
+      "evt-0000035",
+      "evt-0000034",
+      "evt-0000030",
+      "evt-0000024"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-13",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack",
+    "current_stage": "COLLECTION_EXFIL",
+    "stage_confidence": 0.9664,
+    "next_stage": "COLLECTION_EXFIL",
+    "next_confidence": 0.8819,
+    "severity": "CRITICAL",
+    "indicators": [
+      "discovery_sweep",
+      "mfa_failure_then_success",
+      "new_origin",
+      "off_hours_activity",
+      "privilege_change",
+      "sensitive_access"
+    ],
+    "top_events": [
+      "evt-0000029",
+      "evt-0000036",
+      "evt-0000033",
+      "evt-0000032",
+      "evt-0000028"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-14",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack",
+    "current_stage": "COLLECTION_EXFIL",
+    "stage_confidence": 0.9664,
+    "next_stage": "COLLECTION_EXFIL",
+    "next_confidence": 0.9133,
+    "severity": "CRITICAL",
+    "indicators": [
+      "discovery_sweep",
+      "mfa_failure_then_success",
+      "new_origin",
+      "off_hours_activity",
+      "privilege_change",
+      "sensitive_access"
+    ],
+    "top_events": [
+      "evt-0000029",
+      "evt-0000037",
+      "evt-0000036",
+      "evt-0000033",
+      "evt-0000032"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-lookalike-7",
+    "actor": "U_8dfdc888a962",
+    "session_id": "sess-demo-lookalike",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.9659,
+    "next_stage": "BENIGN",
+    "next_confidence": 0.9611,
+    "severity": "LOW",
+    "indicators": [
+      "off_hours_activity",
+      "privilege_change"
+    ],
+    "top_events": [
+      "evt-0000027",
+      "evt-0000038",
+      "evt-0000035",
+      "evt-0000034",
+      "evt-0000030"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  },
+  {
+    "evidence_id": "ev-sess-demo-attack-15",
+    "actor": "U_be14a91ca44d",
+    "session_id": "sess-demo-attack",
+    "current_stage": "IMPACT",
+    "stage_confidence": 0.548,
+    "next_stage": "IMPACT",
+    "next_confidence": 0.8685,
+    "severity": "CRITICAL",
+    "indicators": [
+      "discovery_sweep",
+      "mfa_failure_then_success",
+      "new_origin",
+      "off_hours_activity",
+      "privilege_change",
+      "sensitive_access"
+    ],
+    "top_events": [
+      "evt-0000029",
+      "evt-0000037",
+      "evt-0000036",
+      "evt-0000033",
+      "evt-0000032"
+    ],
+    "model_version": "m3-l16-2eace40f"
+  }
+]
