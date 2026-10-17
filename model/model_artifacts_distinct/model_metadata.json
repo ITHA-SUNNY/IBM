@@ -1,0 +1,72 @@
+{
+  "model_version": "m3-threshold-v1.0",
+  "random_state": 42,
+  "window_size": 10,
+  "next_stage_target": "next_distinct",
+  "feature_names": [
+    "count_discovery_events",
+    "count_event_ALTUSER_SPECIAL",
+    "count_event_DATASET_COPY",
+    "count_event_DATASET_LIST",
+    "count_event_DATASET_READ",
+    "count_event_JOB_SUBMIT",
+    "count_event_LOGOFF",
+    "count_event_LOGON",
+    "count_event_MFA",
+    "count_event_PASSWORD_CHANGE",
+    "count_event_PERMIT",
+    "count_event_RACF_LISTUSER",
+    "count_failed_outcomes",
+    "count_mfa_failures",
+    "count_privilege_changes",
+    "count_sensitive_access",
+    "events_so_far",
+    "last_event_is_ALTUSER_SPECIAL",
+    "last_event_is_DATASET_COPY",
+    "last_event_is_DATASET_LIST",
+    "last_event_is_DATASET_READ",
+    "last_event_is_JOB_SUBMIT",
+    "last_event_is_LOGOFF",
+    "last_event_is_LOGON",
+    "last_event_is_MFA",
+    "last_event_is_PASSWORD_CHANGE",
+    "last_event_is_PERMIT",
+    "last_event_is_RACF_LISTUSER",
+    "last_gap_seconds",
+    "mean_gap_seconds",
+    "new_origin",
+    "off_hours_any",
+    "off_hours_last",
+    "seconds_since_session_start",
+    "window_size"
+  ],
+  "current_stage": {
+    "model_type": "LogisticRegression",
+    "classes": [
+      "BENIGN",
+      "COLLECTION_EXFIL",
+      "CREDENTIAL_ACCESS",
+      "DISCOVERY",
+      "IMPACT",
+      "INITIAL_ACCESS",
+      "LATERAL_MOVEMENT",
+      "PRIVILEGE_ESCALATION"
+    ],
+    "val_accuracy": 0.9084778420038536,
+    "val_macro_f1": 0.8625495855910603
+  },
+  "next_stage": {
+    "model_type": "LogisticRegression",
+    "classes": [
+      "BENIGN",
+      "COLLECTION_EXFIL",
+      "CREDENTIAL_ACCESS",
+      "DISCOVERY",
+      "IMPACT",
+      "LATERAL_MOVEMENT",
+      "PRIVILEGE_ESCALATION"
+    ],
+    "val_accuracy": 0.894990366088632,
+    "val_macro_f1": 0.7854993624711762
+  }
+}

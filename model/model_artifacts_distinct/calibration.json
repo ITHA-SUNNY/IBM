@@ -1,0 +1,17 @@
+{
+  "model_version": "m3-threshold-v1.0",
+  "current_stage": {
+    "temperature": 1.651,
+    "val_ece_before": 0.0654,
+    "val_ece_after": 0.0501,
+    "test_ece_before": 0.0589,
+    "test_ece_after": 0.0467
+  },
+  "next_stage": {
+    "temperature": 1.6335,
+    "val_ece_before": 0.069,
+    "val_ece_after": 0.055,
+    "test_ece_before": 0.07,
+    "test_ece_after": 0.0518
+  }
+}
