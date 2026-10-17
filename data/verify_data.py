@@ -16,7 +16,12 @@ def read(path):
 
 
 def main():
-    root=Path(__file__).resolve().parent
+    import argparse
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--data-dir",type=Path,default=Path(__file__).resolve().parent)
+    parser.add_argument("--key-file",type=Path)
+    args=parser.parse_args()
+    root=args.data_dir
     manifest=json.loads((root/"manifest.json").read_text())
     seen_ids,seen_actors=set(),set();total=0
     for name in ["train","validation","test","harder_test","rare_test","demo_stream"]:
@@ -50,7 +55,7 @@ def main():
                 live=[r for r in own if r["scenario_id"]!="baseline"]
                 assert baseline and live and baseline[-1]["timestamp"]<live[0]["timestamp"]
                 assert all(r["stage_label"]=="BENIGN" and r["origin"]=="KNOWN_NET" for r in baseline)
-            assert all(r["origin"]=="KNOWN_NET" for r in rows if r["scenario_id"]=="lookalike")
+            assert all(r["origin"]=="KNOWN_NET" and r["outcome"]=="SUCCESS" for r in rows if r["scenario_id"]=="lookalike")
         else:
             assert set(STAGES)=={r["stage_label"] for r in rows}
             for kind in {r["scenario_id"] for r in rows}:
@@ -59,12 +64,19 @@ def main():
                 assert {r["off_hours"] for r in first}=={"0","1"},(name,kind)
         if name=="rare_test":assert .01<=sum(s[0]["scenario_id"].startswith("attack") for s in sessions.values())/len(sessions)<=.05
         total+=len(rows)
-    key=load_key(root/".hmac_key")
-    assert manifest["hmac_key_fingerprint"]==__import__("hashlib").sha256(key).hexdigest()[:12]
-    with tempfile.TemporaryDirectory() as d:
-        generated=Path(d);generate(generated,manifest["seed"],manifest["splits"]["train"]["sessions"],key)
-        for p in generated.iterdir():assert p.read_bytes()==(root/p.name).read_bytes(),p.name
-    print(f"PASS: {total} events; contract, operations, split isolation, per-class origin/time overlap, rare prevalence, demo baselines, targets and regeneration verified.")
+    import os
+    key_path=args.key_file or root/".hmac_key"
+    verified_regeneration=False
+    if args.key_file is not None or os.environ.get("THRESHOLD_HMAC_KEY") or key_path.exists():
+        key=load_key(key_path)
+        if manifest["hmac_key_fingerprint"]!=__import__("hashlib").sha256(key).hexdigest()[:12]:
+            raise ValueError("HMAC key differs from dataset fingerprint; use matching key or verify in a fresh data directory without a local key")
+        with tempfile.TemporaryDirectory() as d:
+            generated=Path(d);generate(generated,manifest["seed"],manifest["splits"]["train"]["sessions"],key)
+            for p in generated.iterdir():assert p.read_bytes()==(root/p.name).read_bytes(),p.name
+        verified_regeneration=True
+    print(f"PASS: {total} events; contract, operations, split isolation, class overlap, rare prevalence, demo baselines and targets verified.")
+    print("Byte-identical regeneration: " + ("PASS" if verified_regeneration else "SKIPPED (private key unavailable; structural validation still passed)"))
 
 
 if __name__=="__main__":main()

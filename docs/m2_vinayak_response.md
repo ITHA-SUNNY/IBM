@@ -11,4 +11,6 @@
 9. Harder changes: 4x pacing, multiple noise events, optional failed privilege probes, shuffle of listing observations within discovery. Does not reorder causal stages or claim unseen-family generalization. New-origin benign sessions are now present in all splits.
 10. Schema: FAILURE, LOW/MEDIUM/HIGH, off_hours 0/1 implemented. Full data/schema.py was absent from accessible repo branches: please provide branch/file for final validation. Added operation requires M3/M5 acknowledgment; temporary strict 13-column _core.csv copies exist, but full files are preferred.
 
-Important: v2 changes IDs and enums; regenerate/retrain and avoid mixing v1/v2 files. Validation passes 23,791 generated events. No model performance has been measured by M2.
+Important: v2 changes IDs and enums; regenerate/retrain and avoid mixing v1/v2 files. Validation passes 23,788 generated events. No model performance has been measured by M2.
+
+Audit follow-up: M2 v2.1 adds a causal feature helper, clone-safe verification and a failure-free canonical admin demo. See docs/integration_audit.md for tested M3/M4/M5 contract failures.

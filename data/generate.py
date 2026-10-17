@@ -46,8 +46,8 @@ def session_rows(rng, split, index, kind, key, harder=False, raw_id=None,
     # Origin and hour have the same marginal distribution in each class.
     origin = force_origin or ("NEW_NET" if rng.random() < .4 else "KNOWN_NET")
     hour = force_hour if force_hour is not None else (rng.choice([0, 1, 2, 3, 4, 5, 22]) if rng.random() < .5 else rng.randint(9, 16))
-    offset = {"train":0, "validation":500, "test":1000, "harder_test":1500, "rare_test":2000, "demo":4000}[split]
-    now = BASE + timedelta(days=offset + (index if split != "demo" else 0), hours=hour)
+    offset = {"train":0, "validation":1, "test":2, "harder_test":3, "rare_test":4, "demo":0}[split]
+    now = BASE + timedelta(days=offset, hours=hour, seconds=index % 60)
     steps=[]
     def add(et, operation, stage="BENIGN", sensitivity="LOW", outcome="SUCCESS", system="SYS1", resource=None):
         steps.append([et, operation, stage, sensitivity, outcome, system, resource])
@@ -71,16 +71,16 @@ def session_rows(rng, split, index, kind, key, harder=False, raw_id=None,
             add("CRYPTO_OP", "BULK_ENCRYPT", "IMPACT", "HIGH", system=system)
         add("LOGOFF", "END_SESSION", steps[-1][2], system=system)
     else:
-        if not baseline and rng.random() < .2:add("LOGON", "AUTHENTICATE", outcome="FAILURE")
+        if not baseline and split != "demo" and rng.random() < .2:add("LOGON", "AUTHENTICATE", outcome="FAILURE")
         add("LOGON", "AUTHENTICATE")
-        if not baseline and rng.random() < .25:
+        if not baseline and split != "demo" and rng.random() < .25:
             add("MFA", "CHALLENGE", outcome="FAILURE")
             add("MFA", "CHALLENGE")
         add("DATASET_ACCESS", "LIST", sensitivity="MEDIUM")
         if kind=="lookalike" and not baseline:
             add("ALTUSER_SPECIAL", "GRANT_SPECIAL", sensitivity="HIGH")
             add("DATASET_ACCESS", "READ", sensitivity="HIGH")
-            if rng.random()<.25:add("DATASET_ACCESS", "COPY", sensitivity="HIGH")
+            if split != "demo" and rng.random()<.25:add("DATASET_ACCESS", "COPY", sensitivity="HIGH")
             add("COMMAND_EXEC", "EMERGENCY_FIX", sensitivity="HIGH")
         else:
             add("DATASET_ACCESS", "READ", sensitivity="MEDIUM")
@@ -118,7 +118,7 @@ def write_csv(path,rows,fields=FIELDS):
 def generate(output,seed=42,sessions=400,key=None):
     if key is None:raise ValueError("provide a private HMAC key")
     output.mkdir(parents=True,exist_ok=True)
-    manifest={"schema_version":"2.0","seed":seed,"synthetic_only":True,"hmac_key_fingerprint":hashlib.sha256(key).hexdigest()[:12],"splits":{}}
+    manifest={"schema_version":"2.1","seed":seed,"synthetic_only":True,"hmac_key_fingerprint":hashlib.sha256(key).hexdigest()[:12],"splits":{}}
     for split in ["train","validation","test","harder_test","rare_test","demo"]:
         rng=random.Random(f"{seed}:{split}")
         rows=[]

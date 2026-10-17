@@ -1,4 +1,4 @@
-# M2 event vocabulary v2 and handoff
+# M2 event vocabulary v2.1 and handoff
 
 Run `python data/generate.py`; verify with `python data/verify_data.py`. Python standard library only.
 
@@ -48,3 +48,13 @@ A legitimate NEW_NET admin is still labeled BENIGN. New origin or off-hours alon
 ## Integration warning
 
 Current origin/main predict.py remains a fixed-confidence stub; it groups an entire stream as one prefix, so its caller must group by actor/session. It cannot establish calibrated performance. M3's evidence contract still differs from policy_agent's required fields; M1/M3/M4 must align an adapter. FAILURE/LOW-MEDIUM-HIGH/0-1 replace earlier vocabulary; old trained models need regeneration/retraining, not silent reuse. M3 should consume operation to distinguish discovery from content access.
+
+## Optional M3 feature helper
+
+`python data/features.py --events data/train_events.csv --output data/generated/train_features.csv`
+
+The helper sorts by time, uses only each actor/session prefix (last 32 events), preserves operation and computes failure/privilege/sensitive-access counts, distinct listing resources, new-origin/off-hours flags, inter-event seconds and the six agreed indicator names. MFA recovery appears only after an ordered MFA failure then success in the same window. IDs are returned only for joins, never model features. This helper does not decide severity or claim to be the trained model. Run `python -m unittest discover -s data -p test_features.py` for six behavioral checks.
+
+Fresh-clone verification: `python data/verify_data.py` structurally validates checked-in files without creating a private key. Byte-identical regeneration is skipped when that key is unavailable. To regenerate, the generator creates its own private local key; after generation the verifier can check identical regeneration using that key. Do not mix a locally regenerated split with another person's checked-in splits.
+
+Demo timestamps are on 17 October 2026 UTC; the canonical legitimate look-alike has no authentication failures. Training and harder benign cases intentionally still include occasional failures. For identified integration blockers and owner-specific fixes, see docs/integration_audit.md.
