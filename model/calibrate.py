@@ -141,7 +141,7 @@ def plot_reliability_diagrams(
     fig, axes = plt.subplots(2, 2, figsize=(15, 12), dpi=250)
     fig.patch.set_facecolor('#ffffff')
     fig.suptitle(
-        "Dual-Head Reliability & Calibration Assessment (10-Bin ECE) — Threshold M3",
+        "Dual-Head Reliability & Calibration Assessment (Validation Set, 10-Bin ECE) — Threshold M3",
         fontsize=16,
         fontweight="bold",
         y=0.98,
