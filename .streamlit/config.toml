@@ -1,0 +1,87 @@
+# Threshold console theme — locked dark (security operations console).
+# Colours, fonts and borders live here; no custom CSS in the app.
+
+[theme]
+base = "dark"
+primaryColor = "#2F81F7"              # buttons / links; supports white label text
+backgroundColor = "#0B1120"           # deep navy main background
+secondaryBackgroundColor = "#151C2C"  # widget + card background
+codeBackgroundColor = "#0F172A"
+textColor = "#E6EDF3"
+linkColor = "#58A6FF"
+borderColor = "#243049"
+codeTextColor = "#C9D1D9"
+showWidgetBorder = true
+showSidebarBorder = true
+baseRadius = "0.5rem"
+buttonRadius = "0.5rem"
+
+# Typography
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+headingFont = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@600;700&display=swap"
+codeFont = "'JetBrains Mono':https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+baseFontSize = 15
+baseFontWeight = 400
+codeFontSize = "13px"
+headingFontSizes = ["30px", "22px", "18px", "16px", "14px", "12px"]
+headingFontWeights = [700, 600, 600, 600, 500, 500]
+linkUnderline = false
+
+# Semantic colours (severity / action badges use these names)
+greenColor = "#3FB950"
+redColor = "#F85149"
+yellowColor = "#D29922"
+orangeColor = "#DB6D28"
+blueColor = "#58A6FF"
+violetColor = "#A371F7"
+grayColor = "#8B949E"
+
+# Chart palette (staged timeline / metrics)
+chartCategoricalColors = [
+    "#8B949E",
+    "#3FB950",
+    "#58A6FF",
+    "#D29922",
+    "#DB6D28",
+    "#A371F7",
+    "#F85149",
+    "#FF7B72",
+]
+chartSequentialColors = [
+    "#0B1120",
+    "#12203A",
+    "#1A3057",
+    "#234179",
+    "#2F569B",
+    "#3B6CBE",
+    "#4C86DC",
+    "#6FA0EA",
+    "#9BC0F4",
+    "#C6DCFB",
+]
+chartDivergingColors = [
+    "#67001f",
+    "#b2182b",
+    "#d6604d",
+    "#f4a582",
+    "#fddbc7",
+    "#d1e5f0",
+    "#92c5de",
+    "#4393c3",
+    "#2166ac",
+    "#053061",
+]
+
+# Dataframe chrome
+dataframeBorderColor = "#243049"
+dataframeHeaderBackgroundColor = "#151C2C"
+dataframeHeaderTextColor = "#E6EDF3"
+
+[theme.sidebar]
+backgroundColor = "#0A0F1C"
+secondaryBackgroundColor = "#151C2C"
+codeBackgroundColor = "#0F172A"
+textColor = "#E6EDF3"
+borderColor = "#243049"
+primaryColor = "#2F81F7"
+linkColor = "#58A6FF"
