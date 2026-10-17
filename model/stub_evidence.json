@@ -1,0 +1,23 @@
+{
+  "evidence_id": "ev-sess-1029-05",
+  "actor": "U_9f3a8b2c",
+  "session_id": "sess-1029",
+  "current_stage": "PRIVILEGE_ESCALATION",
+  "stage_confidence": 0.94,
+  "next_stage": "COLLECTION_EXFIL",
+  "next_confidence": 0.88,
+  "severity": "CRITICAL",
+  "indicators": [
+    "new_origin",
+    "mfa_failure_then_success",
+    "privilege_change",
+    "sensitive_access"
+  ],
+  "top_events": [
+    "evt-1029-005",
+    "evt-1029-003",
+    "evt-1029-002",
+    "evt-1029-001"
+  ],
+  "model_version": "m3-stub-v1.0"
+}

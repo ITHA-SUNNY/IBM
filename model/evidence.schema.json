@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ThresholdEvidenceObject",
+  "description": "Validation schema for M3 explainable evidence output contract",
+  "type": "object",
+  "required": [
+    "evidence_id",
+    "actor",
+    "session_id",
+    "current_stage",
+    "stage_confidence",
+    "next_stage",
+    "next_confidence",
+    "severity",
+    "indicators",
+    "top_events",
+    "model_version"
+  ],
+  "properties": {
+    "evidence_id": {
+      "type": "string",
+      "description": "Unique identifier for this evidence observation"
+    },
+    "actor": {
+      "type": "string",
+      "description": "Pseudonymized actor_id from telemetry"
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Session identifier"
+    },
+    "current_stage": {
+      "type": "string",
+      "enum": [
+        "BENIGN",
+        "INITIAL_ACCESS",
+        "CREDENTIAL_ACCESS",
+        "DISCOVERY",
+        "PRIVILEGE_ESCALATION",
+        "LATERAL_MOVEMENT",
+        "COLLECTION_EXFIL",
+        "IMPACT"
+      ]
+    },
+    "stage_confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Calibrated confidence score for the current stage"
+    },
+    "next_stage": {
+      "type": "string",
+      "enum": [
+        "BENIGN",
+        "INITIAL_ACCESS",
+        "CREDENTIAL_ACCESS",
+        "DISCOVERY",
+        "PRIVILEGE_ESCALATION",
+        "LATERAL_MOVEMENT",
+        "COLLECTION_EXFIL",
+        "IMPACT"
+      ]
+    },
+    "next_confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Calibrated confidence score for the anticipated next stage"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "CRITICAL"
+      ]
+    },
+    "indicators": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Rule-based security flags observed within the window"
+    },
+    "top_events": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 5,
+      "description": "Up to 5 event_ids contributing most to risk, ranked by recency and risk"
+    },
+    "model_version": {
+      "type": "string",
+      "description": "Version hash of active model artifacts"
+    }
+  },
+  "additionalProperties": true
+}
