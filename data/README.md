@@ -8,3 +8,7 @@ All constants come from schema.py, supplied by Vinayak. Exact 13 columns, no ope
 Canonical demo_stream.csv has 24 events (two benign histories, one attack, one look-alike). rare_test.csv has 3% attack sessions. See [event_vocab.md](event_vocab.md).
 
 IMPACT remains a reserved stage but has no training data, because the supplied event vocabulary has no reviewed impact/write/crypto observation. Do not claim it is trained. Model owners should import from data.schema rather than copy enum lists.
+
+## Trained M3 handoff
+
+The optional M2 data/features.py helper is not the saved M3 model feature contract. M6 must use model.features.build_windows (window=10, next_distinct, exclude_timing=True) or M3 predict_stream on raw CSV with explicit unified artifact path. See docs/m3_handoff_review.md. Keep validated datasets frozen.
