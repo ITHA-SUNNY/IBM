@@ -19,7 +19,7 @@ class FeatureTests(unittest.TestCase):
         row=event(1);plain=feature_rows([row]);row.update(stage_label="IMPACT",scenario_id="attack")
         self.assertEqual(plain,feature_rows([row]))
     def test_failed_privilege_and_listing_are_not_sensitive_access(self):
-        rows=[event(1,et="ALTUSER_SPECIAL",op="GRANT_SPECIAL",outcome="FAILURE"),event(2,et="DATASET_ACCESS",op="LIST")]
+        rows=[event(1,et="ALTUSER_SPECIAL",op="GRANT_SPECIAL",outcome="FAILURE"),event(2,et="DATASET_LIST",op="LIST")]
         last=feature_rows(rows)[-1]
         self.assertEqual(last["privilege_change_count"],0);self.assertEqual(last["sensitive_access_count"],0)
     def test_window_evicts_old_failures(self):

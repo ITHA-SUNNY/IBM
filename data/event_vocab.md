@@ -1,60 +1,48 @@
-# M2 event vocabulary v2.1 and handoff
+# M2 event vocabulary v3.0 ? Vinayak schema aligned
 
-Run `python data/generate.py`; verify with `python data/verify_data.py`. Python standard library only.
+`data/schema.py` is the single source of truth supplied by Vinayak. Generator, strict validator and feature helper import it; model/adapters must import it too. Run `python data/generate.py`, `python data/verify_data.py`, and `python -m unittest discover -s data -p "test_*.py"`.
 
-## Schema status
+## Exact CSV contract
 
-The exact data/schema.py referenced in chat was not present on any accessible remote branch when checked. These values implement Vinayak's stated changes; full schema compatibility is pending his file/link. Do not claim it is already validated against that file.
+Exactly these 13 columns, in order:
+`event_id,timestamp,system_id,actor_id,session_id,event_type,outcome,resource,sensitivity,origin,off_hours,stage_label,scenario_id`
 
-CSV columns: event_id,timestamp,system_id,actor_id,session_id,event_type,outcome,resource,sensitivity,origin,off_hours,stage_label,scenario_id,operation.
+No operation column. Listing/reading/copying are event_type values themselves.
 
-The first 13 columns retain the shared contract; operation is an additive field required to distinguish listing, reading and copying. Strict 13-column `_core.csv` copies are provided for temporary compatibility, but they lose operation detail. Consumers should use column names and read the full files.
-
-- event_type: LOGON, MFA, DATASET_ACCESS, ALTUSER_SPECIAL, COMMAND_EXEC, CRYPTO_OP, LOGOFF
+- event_type: LOGON, LOGOFF, MFA, JOB_SUBMIT, PASSWORD_CHANGE, DATASET_LIST, RACF_LISTUSER, ALTUSER_SPECIAL, PERMIT, DATASET_READ, DATASET_COPY
 - outcome: SUCCESS, FAILURE
-- sensitivity: LOW, MEDIUM, HIGH (HIGH maps former CRITICAL; MEDIUM maps former INTERNAL dataset access)
-- off_hours: integer 0 or 1; relative to UTC in this simulation, outside 06:00?21:59. This is a calendar flag, not deviation from a per-user schedule.
-- origin: NEW_NET, KNOWN_NET, independent of ground-truth class; no literal IPs.
-- actor_id: U_ plus 12 lowercase hexadecimal digits of HMAC-SHA256.
-- stage_label: BENIGN, INITIAL_ACCESS, CREDENTIAL_ACCESS, DISCOVERY, PRIVILEGE_ESCALATION, LATERAL_MOVEMENT, COLLECTION_EXFIL, IMPACT
-- scenario_id: background, lookalike, attack, attack_lateral, attack_impact, baseline (demo only)
+- sensitivity: LOW, MEDIUM, HIGH
+- off_hours: 0 or 1; UTC hour <6 or >=20, computed by schema.is_off_hours (not the former 22:00 cutoff).
+- actor_id: U_ plus first 12 lowercase hex characters of HMAC-SHA256.
+- timestamp: %Y-%m-%dT%H:%M:%SZ (UTC)
+- origin: KNOWN_NET or NEW_NET in this generator; schema itself only requires non-empty text.
+- standard scenario_id: benign, attack_v1, attack_v2, lookalike_v1. demo_baseline is the permitted non-empty custom history label.
+- fixed stage vocabulary: BENIGN, INITIAL_ACCESS, CREDENTIAL_ACCESS, DISCOVERY, PRIVILEGE_ESCALATION, LATERAL_MOVEMENT, COLLECTION_EXFIL, IMPACT.
 
-## Event semantics
+DATASET_LIST is catalog enumeration; RACF_LISTUSER enumerates user attributes; DATASET_READ reads content; DATASET_COPY represents a synthetic transfer/copy. JOB_SUBMIT represents a submitted batch job. PASSWORD_CHANGE is a password change. These are normalized synthetic observations, not verified binary SMF records.
 
-DATASET_ACCESS is a resource request. operation distinguishes LIST (directory/catalog enumeration), READ (content retrieval), COPY (synthetic bulk transfer), WRITE (content modification). Listing is NOT the same observation as reading/copying. Repeated listings across resources followed by a privileged change and repeated high-sensitivity copies define the authored attack chain; they are not proof of exfiltration in production.
+## No guessed legacy mappings
 
-COMMAND_EXEC means a synthetic command/program invocation. operation: BATCH_JOB, EMERGENCY_FIX, ROUTINE_STATUS. CRYPTO_OP means an abstract cryptographic operation, KEY_ROTATE or BULK_ENCRYPT, NOT an actual ICSF record parser. Legitimate crypto and copying are included. Other operations: AUTHENTICATE (LOGON), CHALLENGE (MFA), GRANT_SPECIAL (ALTUSER_SPECIAL), END_SESSION (LOGOFF). Resource names are shared across classes.
+Use schema.normalize_event_type for the explicitly supplied mappings. Unmapped names remain unchanged and strict validation rejects them. In particular the previous generic DATASET_ACCESS, COMMAND_EXEC and CRYPTO_OP are no longer emitted. No WRITE/crypto event exists in the accepted vocabulary, so impact simulation is removed rather than disguising it as a read/copy. IMPACT remains the fixed eighth output class but has zero training observations in these files; M3 must handle absent classes explicitly or request a reviewed schema extension. Do not claim all eight stages are learned.
 
-## Files and targets
+UNMAPPED (from supplied legacy schema): REVOKE_SPECIAL, EDIT_DATASET, WRITE_DATASET, QUERY_JOB_STATUS, VIEW_SYSLOG, RESTART_SERVICE, READ_SPOOL_OUTPUT, ALLOC_TEMP_DATASET, SORT_EXEC, WRITE_LOG, BATCH_PURGE_TEMP, BATCH_TERMINATE, ACCESS_ISPF.
 
-`data/demo_stream.csv` on this branch is the canonical M2 demo for M5. It has four sessions: two short BENIGN baselines using the same two actors, followed by one attack and one legitimate look-alike. Baselines precede both main sessions; admin origin remains KNOWN_NET. M5 can label the first two sessions as history. Session-level model replay must not combine the two actors; retain actor history across sessions only for baseline features.
+## Files and demo
 
-train.csv, validation.csv and test.csv have independent actors/sessions and 40% attack sessions to exercise all classes, not to estimate operational prevalence. harder_test.csv is also independent and adds 4x pacing, 2?4 neutral events, optional failed privilege probes and within-DISCOVERY listing-order shuffles. It does NOT reverse causal stages or establish unseen-family generalization. Benign new origins and off-hours exist in every split, not just harder_test.
+Canonical M5 file: data/demo_stream.csv (24 events), two same-actor BENIGN baseline histories followed by one attack_v1 and one lookalike_v1; demo admin stays KNOWN_NET and has no authentication failures. Two actors, four sessions. M5 must classify demo_baseline as history instead of attack; its current generic selector still needs that fix.
 
-rare_test.csv has 1,000 sessions with 30 attacks (3%). Report benign false-positive rate as false positives / benign sessions, and precision with the prevalence stated. Rare prevalence changes precision; it does not alone repair model validity. Do not tune on this split.
+train/validation/test have 400 sessions each, including 160 attacks (40%). harder_test has 400 sessions with 4x pacing, additional JOB_SUBMIT noise, failed privilege probes and discovery-observation ordering changes, preserving causal stage progression. rare_test has 1,000 sessions and 30 attacks (3%). Origin and off-hours vary in every class of every split. Expected legitimate NEW_NET behavior remains BENIGN; origin/time alone must not cause containment. Final model/policy behavior must be measured, not assumed.
 
-Each dataset has `_events.csv` without stage_label/scenario_id and `_labels.csv` for targets. Never train on labels, identifiers or scenario_id as features. Sidecar next_stage_label means next DIFFERENT stage; without a later change it remains the current stage. M3 must confirm this convention.
+Each dataset has an unlabeled _events.csv for inference and _labels.csv for training/evaluation joins. _core.csv is now a byte-equivalent 13-column compatibility alias. Exclude stage_label/scenario_id and identifiers from predictive features. The sidecar next_stage_label means next DIFFERENT stage, otherwise current stage. M3 still needs to confirm that target convention. Train on train, calibrate on validation, tune policy on a separate partition of train, and keep test/harder/rare untouched until evaluation. Report benign false-positive counts with their denominators and precision with stated prevalence.
 
-## Privacy and reproducibility
-
-Raw IDs are invented: SYNTH_<split>_<index padded to 5 digits>; demo uses SYNTH_demo_attacker and SYNTH_demo_admin for both baseline and main session. They are HMAC'd before export. There are no real identities, no exported raw-ID mapping and no cross-split actor overlap. Demo intentionally repeats actors within its own split.
-
-THRESHOLD_HMAC_KEY supplies a private secret, or the CLI creates a random 32-byte local data/.hmac_key, ignored by Git. Do not commit/share that key. The prior public demonstration key has been replaced; IDs changed. Reproducibility requires the same seed AND key. Teammates without the key can consume checked-in CSVs or regenerate their own consistent pseudonyms; they should not expect byte-identical IDs. The manifest exposes only a key fingerprint.
-
-## Expected benign behavior and limits
-
-A legitimate NEW_NET admin is still labeled BENIGN. New origin or off-hours alone must not cause containment; if model confidence is uncertain, policy should route to an analyst. These are acceptance goals, not guaranteed model outputs. Benign and attack sequences deliberately overlap. Synthetic stage labels are authored ground truth; accuracy does not establish real enterprise protection. Hold out test/harder/rare data from fitting, calibration and policy tuning.
-
-## Integration warning
-
-Current origin/main predict.py remains a fixed-confidence stub; it groups an entire stream as one prefix, so its caller must group by actor/session. It cannot establish calibrated performance. M3's evidence contract still differs from policy_agent's required fields; M1/M3/M4 must align an adapter. FAILURE/LOW-MEDIUM-HIGH/0-1 replace earlier vocabulary; old trained models need regeneration/retraining, not silent reuse. M3 should consume operation to distinguish discovery from content access.
-
-## Optional M3 feature helper
+## Causal feature helper
 
 `python data/features.py --events data/train_events.csv --output data/generated/train_features.csv`
 
-The helper sorts by time, uses only each actor/session prefix (last 32 events), preserves operation and computes failure/privilege/sensitive-access counts, distinct listing resources, new-origin/off-hours flags, inter-event seconds and the six agreed indicator names. MFA recovery appears only after an ordered MFA failure then success in the same window. IDs are returned only for joins, never model features. This helper does not decide severity or claim to be the trained model. Run `python -m unittest discover -s data -p test_features.py` for six behavioral checks.
+Computes rolling 32-event per-actor/session counts, distinct discovered resources, origin/hour flags, inter-event seconds and the six agreed indicators. Uses PRIVILEGE_CHANGE_TYPES/DISCOVERY_TYPES from schema. MFA recovery requires ordered failure then success in that session window. Reads DATASET_READ/DATASET_COPY directly; no operation column is needed. IDs in output are join metadata only. Does not train a model, produce confidence or decide policy.
 
-Fresh-clone verification: `python data/verify_data.py` structurally validates checked-in files without creating a private key. Byte-identical regeneration is skipped when that key is unavailable. To regenerate, the generator creates its own private local key; after generation the verifier can check identical regeneration using that key. Do not mix a locally regenerated split with another person's checked-in splits.
+## Privacy and reproducibility
 
-Demo timestamps are on 17 October 2026 UTC; the canonical legitimate look-alike has no authentication failures. Training and harder benign cases intentionally still include occasional failures. For identified integration blockers and owner-specific fixes, see docs/integration_audit.md.
+Raw IDs are invented SYNTH_<split>_<5-digit index>; demo uses SYNTH_demo_attacker/admin. They are HMAC'd before export. Private key comes from THRESHOLD_HMAC_KEY or ignored random data/.hmac_key; no secret/raw-ID mapping is committed. Repeatable bytes require same seed AND key. A fresh clone can structurally verify CSVs without the private key; byte regeneration explicitly skips if key is unavailable. Teammates can generate their own consistent IDs using their own key, but should not mix new and old splits. All actors are disjoint across splits, with intentional same-actor history inside demo.
+
+These files are synthetic; neither their labels nor measured calibration establish enterprise accuracy. All changes from v2 require model regeneration/retraining. Current total: 22,540 events. See docs/integration_audit.md for outstanding integration risks.

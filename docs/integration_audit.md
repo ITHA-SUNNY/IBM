@@ -1,3 +1,11 @@
+# Schema alignment follow-up ? v3.0
+
+Vinayak supplied the complete schema in chat after the initial audit. Added data/schema.py and imported its constants/functions from generator, validator and feature helper. All canonical files now have exactly 13 columns, and DATASET_LIST/READ/COPY are event types; operation is removed. Off-hours now follows UTC >=20:00 or <06:00. The earlier schema-availability and M5 operation-drop findings below are RESOLVED by this change. The UI baseline selector, M3/M4 evidence/API/hash mismatches and other integration risks still need owner fixes.
+
+Current dataset total: 22,540 events; 9 M2 tests pass. Demo has 24 events. IMPACT is reserved but unsupported by the approved observation types, so the generator no longer manufactures an impact scenario. Seven stages are represented. M3 must acknowledge the absent class or request a schema extension; do not claim 8-stage training coverage. Exact-column validator added as data/validate_events.py. Sidecar next-stage convention still awaits M3 confirmation.
+
+The following section records the earlier audit and its original observed counts; this follow-up supersedes its schema/operation/count statements.
+
 # Integration audit ? 17 October 2026
 
 Scope: origin/main at 1c7ba31; M5 remote branch at 6675199; M2 branch; all nine tabs of the shared team Google Doc. PR #1 remains open/unmerged at audit time. New work outside these accessible branches may differ. data/schema.py was absent from all accessible heads; its full enum validation remains pending Vinayak's file/link.

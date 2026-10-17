@@ -1,3 +1,7 @@
+# Update after receiving schema.py
+
+Schema is now implemented exactly in data/schema.py. All canonical files have 13 columns; operation was removed. Listing/reading/copying use DATASET_LIST, DATASET_READ and DATASET_COPY. Generator/validator/features import shared definitions. Off-hours is <06:00 or >=20:00 UTC. Current count: 22,540 events; 9 M2 tests pass. Schema-compatible baseline/noise and batch sessions retained. Canonical demo has 24 events. IMPACT remains in STAGES but has no training rows because the supplied vocabulary excludes impact/write/crypto events; that requires M3 acknowledgment or an explicit schema extension. See data/event_vocab.md for the final contract. Earlier answers below are historical wherever they mention operation, crypto/write or unavailable schema.
+
 # M2 v2 response to data review
 
 1. Separation: v1 was too confounded by new origin/time. v2 samples both independently of class and includes all origin/time combinations per scenario in every generated split. The authored attack pattern combines MFA failure/success, repeated catalog listing, privilege change and repeated high-sensitivity copies. Legitimate behavior overlaps those operations, so no single event proves an attack. This is synthetic ground truth, not verified detection effectiveness.

@@ -6,7 +6,9 @@ import tempfile
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from generate import CORE_FIELDS, FIELDS, STAGES, EVENT_TYPES, OUTCOMES, SENSITIVITIES, generate, load_key
+from generate import generate, load_key
+from schema import COLUMNS as FIELDS, COLUMNS as CORE_FIELDS, STAGES, EVENT_TYPES, OUTCOMES, SENSITIVITY as SENSITIVITIES, is_off_hours
+from validate_events import validate_file
 
 
 def read(path):
@@ -31,10 +33,9 @@ def main():
         assert all(re.fullmatch(r"U_[0-9a-f]{12}",r["actor_id"]) for r in rows)
         assert all(r["stage_label"] in STAGES and r["event_type"] in EVENT_TYPES and r["outcome"] in OUTCOMES and r["sensitivity"] in SENSITIVITIES for r in rows)
         assert all(r["off_hours"] in ["0","1"] for r in rows)
-        for r in rows:
-            allowed={"DATASET_ACCESS":{"LIST","READ","COPY","WRITE"},"COMMAND_EXEC":{"BATCH_JOB","EMERGENCY_FIX","ROUTINE_STATUS"},"CRYPTO_OP":{"KEY_ROTATE","BULK_ENCRYPT"},"LOGON":{"AUTHENTICATE"},"MFA":{"CHALLENGE"},"ALTUSER_SPECIAL":{"GRANT_SPECIAL"},"LOGOFF":{"END_SESSION"}}
-            assert r["operation"] in allowed[r["event_type"]]
-        assert all(int(r["off_hours"])==int(datetime.fromisoformat(r["timestamp"].replace("Z","+00:00")).hour<6 or datetime.fromisoformat(r["timestamp"].replace("Z","+00:00")).hour>=22) for r in rows)
+        validate_file(root/f"{name}.csv")
+        validate_file(root/f"{name}_events.csv",unlabeled=True)
+        assert all(int(r["off_hours"])==is_off_hours(r["timestamp"]) for r in rows)
         assert rows==sorted(rows,key=lambda r:(r["timestamp"],r["event_id"]))
         fields,features=read(root/f"{name}_events.csv");assert len(features)==len(rows)
         assert "stage_label" not in fields and "scenario_id" not in fields
@@ -51,13 +52,13 @@ def main():
             assert len(sessions)==4 and len(actors)==2
             for actor in actors:
                 own=[r for r in rows if r["actor_id"]==actor]
-                baseline=[r for r in own if r["scenario_id"]=="baseline"]
-                live=[r for r in own if r["scenario_id"]!="baseline"]
+                baseline=[r for r in own if r["scenario_id"]=="demo_baseline"]
+                live=[r for r in own if r["scenario_id"]!="demo_baseline"]
                 assert baseline and live and baseline[-1]["timestamp"]<live[0]["timestamp"]
                 assert all(r["stage_label"]=="BENIGN" and r["origin"]=="KNOWN_NET" for r in baseline)
-            assert all(r["origin"]=="KNOWN_NET" and r["outcome"]=="SUCCESS" for r in rows if r["scenario_id"]=="lookalike")
+            assert all(r["origin"]=="KNOWN_NET" and r["outcome"]=="SUCCESS" for r in rows if r["scenario_id"]=="lookalike_v1")
         else:
-            assert set(STAGES)=={r["stage_label"] for r in rows}
+            assert set(STAGES)-{"IMPACT"}=={r["stage_label"] for r in rows}
             for kind in {r["scenario_id"] for r in rows}:
                 first=[s[0] for s in sessions.values() if s[0]["scenario_id"]==kind]
                 assert {r["origin"] for r in first}=={"NEW_NET","KNOWN_NET"},(name,kind)
@@ -75,7 +76,7 @@ def main():
             generated=Path(d);generate(generated,manifest["seed"],manifest["splits"]["train"]["sessions"],key)
             for p in generated.iterdir():assert p.read_bytes()==(root/p.name).read_bytes(),p.name
         verified_regeneration=True
-    print(f"PASS: {total} events; contract, operations, split isolation, class overlap, rare prevalence, demo baselines and targets verified.")
+    print(f"PASS: {total} events; exact schema, split isolation, class overlap, rare prevalence, demo baselines and targets verified.")
     print("Byte-identical regeneration: " + ("PASS" if verified_regeneration else "SKIPPED (private key unavailable; structural validation still passed)"))
 
 

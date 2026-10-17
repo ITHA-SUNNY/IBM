@@ -5,6 +5,10 @@ import json
 from collections import defaultdict, deque
 from datetime import datetime
 from pathlib import Path
+try:
+    from .schema import PRIVILEGE_CHANGE_TYPES, DISCOVERY_TYPES
+except ImportError:
+    from schema import PRIVILEGE_CHANGE_TYPES, DISCOVERY_TYPES
 
 
 def feature_rows(events, window=32):
@@ -22,9 +26,9 @@ def feature_rows(events, window=32):
             if r["event_type"]=="MFA" and r["outcome"]=="FAILURE":failed_mfa=True
             if r["event_type"]=="MFA" and r["outcome"]=="SUCCESS" and failed_mfa:recovered_mfa=True
         failures=sum(r["outcome"]=="FAILURE" for r in prefix)
-        privileges=sum(r["event_type"]=="ALTUSER_SPECIAL" and r["outcome"]=="SUCCESS" for r in prefix)
-        sensitive=sum(r["event_type"]=="DATASET_ACCESS" and r["operation"] in {"READ","COPY","WRITE"} and r["sensitivity"]=="HIGH" and r["outcome"]=="SUCCESS" for r in prefix)
-        listing={r["resource"] for r in prefix if r["operation"]=="LIST" and r["outcome"]=="SUCCESS"}
+        privileges=sum(r["event_type"] in PRIVILEGE_CHANGE_TYPES and r["outcome"]=="SUCCESS" for r in prefix)
+        sensitive=sum(r["event_type"] in {"DATASET_READ","DATASET_COPY"} and r["sensitivity"]=="HIGH" and r["outcome"]=="SUCCESS" for r in prefix)
+        listing={r["resource"] for r in prefix if r["event_type"] in DISCOVERY_TYPES and r["outcome"]=="SUCCESS"}
         indicators=[]
         if any(r["origin"]=="NEW_NET" for r in prefix):indicators.append("new_origin")
         if any(str(r["off_hours"]).lower() in {"1","true"} for r in prefix):indicators.append("off_hours_activity")
@@ -32,7 +36,7 @@ def feature_rows(events, window=32):
         if privileges:indicators.append("privilege_change")
         if sensitive:indicators.append("sensitive_access")
         if len(listing)>=3:indicators.append("discovery_sweep")
-        rows.append({"event_id":event["event_id"],"actor_id":event["actor_id"],"session_id":event["session_id"],"event_type":event["event_type"],"operation":event["operation"],"outcome":event["outcome"],"sensitivity":event["sensitivity"],"failure_count":failures,"privilege_change_count":privileges,"sensitive_access_count":sensitive,"distinct_listed_resources":len(listing),"mfa_failure_then_success":int(recovered_mfa),"new_origin":int(event["origin"]=="NEW_NET"),"off_hours":int(str(event["off_hours"]).lower() in {"1","true"}),"inter_event_seconds":0 if last is None else (current-last).total_seconds(),"indicators":json.dumps(indicators)})
+        rows.append({"event_id":event["event_id"],"actor_id":event["actor_id"],"session_id":event["session_id"],"event_type":event["event_type"],"outcome":event["outcome"],"sensitivity":event["sensitivity"],"failure_count":failures,"privilege_change_count":privileges,"sensitive_access_count":sensitive,"distinct_listed_resources":len(listing),"mfa_failure_then_success":int(recovered_mfa),"new_origin":int(event["origin"]=="NEW_NET"),"off_hours":int(str(event["off_hours"]).lower() in {"1","true"}),"inter_event_seconds":0 if last is None else (current-last).total_seconds(),"indicators":json.dumps(indicators)})
     return rows
 
 

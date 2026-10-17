@@ -10,12 +10,13 @@ import secrets
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-CORE_FIELDS = "event_id timestamp system_id actor_id session_id event_type outcome resource sensitivity origin off_hours stage_label scenario_id".split()
-FIELDS = CORE_FIELDS + ["operation"]
-STAGES = "BENIGN INITIAL_ACCESS CREDENTIAL_ACCESS DISCOVERY PRIVILEGE_ESCALATION LATERAL_MOVEMENT COLLECTION_EXFIL IMPACT".split()
-EVENT_TYPES = ["LOGON", "MFA", "DATASET_ACCESS", "ALTUSER_SPECIAL", "COMMAND_EXEC", "CRYPTO_OP", "LOGOFF"]
-OUTCOMES = ["SUCCESS", "FAILURE"]
-SENSITIVITIES = ["LOW", "MEDIUM", "HIGH"]
+try:
+    from .schema import COLUMNS, STAGES, EVENT_TYPES, OUTCOMES, SENSITIVITY, DISCOVERY_TYPES, is_off_hours
+except ImportError:
+    from schema import COLUMNS, STAGES, EVENT_TYPES, OUTCOMES, SENSITIVITY, DISCOVERY_TYPES, is_off_hours
+CORE_FIELDS = COLUMNS
+FIELDS = COLUMNS
+SENSITIVITIES = SENSITIVITY
 BASE = datetime(2026, 10, 17, tzinfo=timezone.utc)
 
 
@@ -49,63 +50,56 @@ def session_rows(rng, split, index, kind, key, harder=False, raw_id=None,
     offset = {"train":0, "validation":1, "test":2, "harder_test":3, "rare_test":4, "demo":0}[split]
     now = BASE + timedelta(days=offset, hours=hour, seconds=index % 60)
     steps=[]
-    def add(et, operation, stage="BENIGN", sensitivity="LOW", outcome="SUCCESS", system="SYS1", resource=None):
-        steps.append([et, operation, stage, sensitivity, outcome, system, resource])
+    def add(et, stage="BENIGN", sensitivity="LOW", outcome="SUCCESS", system="SYS1", resource=None):
+        steps.append([et, stage, sensitivity, outcome, system, resource])
     if attack:
-        add("LOGON", "AUTHENTICATE", "INITIAL_ACCESS")
-        add("MFA", "CHALLENGE", "CREDENTIAL_ACCESS", outcome="FAILURE")
-        add("MFA", "CHALLENGE", "CREDENTIAL_ACCESS")
+        add("LOGON", "INITIAL_ACCESS")
+        add("MFA", "CREDENTIAL_ACCESS", outcome="FAILURE")
+        add("MFA", "CREDENTIAL_ACCESS")
         for _ in range(rng.randint(3, 6)):
-            add("DATASET_ACCESS", "LIST", "DISCOVERY", "MEDIUM", resource=rng.choice(["FINANCE.DATA", "PAYROLL.DATA", "OPS.DATA"]))
-        # Harder variants can include failed privilege probes before success.
-        if harder and rng.random() < .5:
-            add("ALTUSER_SPECIAL", "GRANT_SPECIAL", "DISCOVERY", "HIGH", "FAILURE")
-        add("ALTUSER_SPECIAL", "GRANT_SPECIAL", "PRIVILEGE_ESCALATION", "HIGH")
-        system="SYS2" if kind=="attack_lateral" else "SYS1"
-        if system=="SYS2":add("LOGON", "AUTHENTICATE", "LATERAL_MOVEMENT", system=system)
-        add("DATASET_ACCESS", "READ", "COLLECTION_EXFIL", "HIGH", system=system)
-        for _ in range(rng.randint(2, 4)):
-            add("DATASET_ACCESS", "COPY", "COLLECTION_EXFIL", "HIGH", system=system)
-        if kind=="attack_impact":
-            add("DATASET_ACCESS", "WRITE", "IMPACT", "HIGH", system=system)
-            add("CRYPTO_OP", "BULK_ENCRYPT", "IMPACT", "HIGH", system=system)
-        add("LOGOFF", "END_SESSION", steps[-1][2], system=system)
+            et=rng.choice(DISCOVERY_TYPES)
+            resource="RACF_DB" if et=="RACF_LISTUSER" else rng.choice(["FINANCE.DATA","PAYROLL.DATA","OPS.DATA"])
+            add(et,"DISCOVERY","MEDIUM",resource=resource)
+        if harder and rng.random()<.5:
+            add("ALTUSER_SPECIAL","DISCOVERY","HIGH","FAILURE")
+        add("ALTUSER_SPECIAL","PRIVILEGE_ESCALATION","HIGH")
+        system="SYS2" if kind=="attack_v2" else "SYS1"
+        if system=="SYS2":add("LOGON","LATERAL_MOVEMENT",system=system)
+        add("DATASET_READ","COLLECTION_EXFIL","HIGH",system=system)
+        for _ in range(rng.randint(2,4)):
+            add("DATASET_COPY","COLLECTION_EXFIL","HIGH",system=system)
+        add("LOGOFF",steps[-1][1],system=system)
     else:
-        if not baseline and split != "demo" and rng.random() < .2:add("LOGON", "AUTHENTICATE", outcome="FAILURE")
-        add("LOGON", "AUTHENTICATE")
-        if not baseline and split != "demo" and rng.random() < .25:
-            add("MFA", "CHALLENGE", outcome="FAILURE")
-            add("MFA", "CHALLENGE")
-        add("DATASET_ACCESS", "LIST", sensitivity="MEDIUM")
-        if kind=="lookalike" and not baseline:
-            add("ALTUSER_SPECIAL", "GRANT_SPECIAL", sensitivity="HIGH")
-            add("DATASET_ACCESS", "READ", sensitivity="HIGH")
-            if split != "demo" and rng.random()<.25:add("DATASET_ACCESS", "COPY", sensitivity="HIGH")
-            add("COMMAND_EXEC", "EMERGENCY_FIX", sensitivity="HIGH")
+        if not baseline and split!="demo" and rng.random()<.2:add("LOGON",outcome="FAILURE")
+        add("LOGON")
+        if not baseline and split!="demo" and rng.random()<.25:
+            add("MFA",outcome="FAILURE");add("MFA")
+        add("DATASET_LIST",sensitivity="MEDIUM")
+        if kind=="lookalike_v1" and not baseline:
+            add("ALTUSER_SPECIAL",sensitivity="HIGH")
+            add("DATASET_READ",sensitivity="HIGH")
+            if split!="demo" and rng.random()<.25:add("DATASET_COPY",sensitivity="HIGH")
         else:
-            add("DATASET_ACCESS", "READ", sensitivity="MEDIUM")
+            add("DATASET_READ",sensitivity="MEDIUM")
             if not baseline:
-                add("COMMAND_EXEC", "BATCH_JOB")
-                if rng.random()<.3:add("DATASET_ACCESS", "COPY", sensitivity="HIGH")
-                if rng.random()<.25:add("CRYPTO_OP", "KEY_ROTATE", sensitivity="HIGH")
-                if rng.random()<.15:add("CRYPTO_OP", "BULK_ENCRYPT", sensitivity="HIGH")
-        add("LOGOFF", "END_SESSION")
+                add("JOB_SUBMIT",resource="OVERNIGHT_BATCH" if hour<6 or hour>=20 else "BATCH_JOB")
+                if rng.random()<.3:add("DATASET_COPY",sensitivity="HIGH")
+                if rng.random()<.2:add("PASSWORD_CHANGE",sensitivity="MEDIUM")
+                if rng.random()<.15:add("PERMIT",sensitivity="HIGH")
+        add("LOGOFF")
     if harder:
-        # Shuffle adjacent LIST observations only, preserving stage prerequisites.
-        lists=[i for i,s in enumerate(steps) if s[1]=="LIST"]
-        if len(lists)>1:
-            values=[steps[i] for i in lists];rng.shuffle(values)
-            for i,value in zip(lists,values):steps[i]=value
-        for _ in range(rng.randint(2, 4)):
-            pos=rng.randint(1,len(steps)-1)
-            prev=steps[pos-1]
-            steps.insert(pos,["COMMAND_EXEC","ROUTINE_STATUS",prev[2],"LOW","SUCCESS",prev[5],None])
+        indices=[i for i,s in enumerate(steps) if s[0] in DISCOVERY_TYPES]
+        if len(indices)>1:
+            values=[steps[i] for i in indices];rng.shuffle(values)
+            for i,value in zip(indices,values):steps[i]=value
+        for _ in range(rng.randint(2,4)):
+            pos=rng.randint(1,len(steps)-1);prev=steps[pos-1]
+            steps.insert(pos,["JOB_SUBMIT",prev[1],"LOW","SUCCESS",prev[4],"BACKGROUND_BATCH"])
     rows=[]
-    for n,(et,operation,stage,sensitivity,outcome,system,resource) in enumerate(steps):
-        # Shared resource vocabulary: resource names do not encode attack labels.
-        resource=resource or {"LOGON":"RACF","MFA":"MFA_CHALLENGE","ALTUSER_SPECIAL":"RACF_DB","LOGOFF":"RACF","CRYPTO_OP":"SYNTH_KEYSTORE","COMMAND_EXEC":"SYSTEM_COMMAND"}.get(et,rng.choice(["FINANCE.DATA","PAYROLL.DATA","OPS.DATA"]))
+    for n,(et,stage,sensitivity,outcome,system,resource) in enumerate(steps):
+        resource=resource or {"LOGON":"RACF","MFA":"MFA_CHALLENGE","ALTUSER_SPECIAL":"RACF_DB","PERMIT":"RACF_DB","LOGOFF":"RACF","PASSWORD_CHANGE":"RACF"}.get(et,rng.choice(["FINANCE.DATA","PAYROLL.DATA","OPS.DATA"]))
         now+=timedelta(seconds=rng.randint(10,45)*(4 if harder else 1))
-        rows.append(dict(zip(FIELDS,[f"{sid}-e{n:03d}",now.isoformat().replace("+00:00","Z"),system,actor,sid,et,outcome,resource,sensitivity,origin,int(now.hour<6 or now.hour>=22),stage,"baseline" if baseline else kind,operation])))
+        rows.append(dict(zip(FIELDS,[f"{sid}-e{n:03d}",now.isoformat().replace("+00:00","Z"),system,actor,sid,et,outcome,resource,sensitivity,origin,is_off_hours(now),stage,"demo_baseline" if baseline else kind])))
     return rows
 
 
@@ -118,28 +112,28 @@ def write_csv(path,rows,fields=FIELDS):
 def generate(output,seed=42,sessions=400,key=None):
     if key is None:raise ValueError("provide a private HMAC key")
     output.mkdir(parents=True,exist_ok=True)
-    manifest={"schema_version":"2.1","seed":seed,"synthetic_only":True,"hmac_key_fingerprint":hashlib.sha256(key).hexdigest()[:12],"splits":{}}
+    manifest={"schema_version":"3.0","seed":seed,"synthetic_only":True,"hmac_key_fingerprint":hashlib.sha256(key).hexdigest()[:12],"splits":{}}
     for split in ["train","validation","test","harder_test","rare_test","demo"]:
         rng=random.Random(f"{seed}:{split}")
         rows=[]
         if split=="demo":
             # Baselines for the SAME actors, before their two main sessions.
             for i,raw in enumerate(["SYNTH_demo_attacker","SYNTH_demo_admin"]):
-                rows+=session_rows(rng,split,i,"background",key,raw_id=raw,baseline=True,force_origin="KNOWN_NET",force_hour=0)
-            rows+=session_rows(rng,split,2,"attack",key,raw_id="SYNTH_demo_attacker",force_origin="NEW_NET",force_hour=2)
-            rows+=session_rows(rng,split,3,"lookalike",key,raw_id="SYNTH_demo_admin",force_origin="KNOWN_NET",force_hour=2)
+                rows+=session_rows(rng,split,i,"benign",key,raw_id=raw,baseline=True,force_origin="KNOWN_NET",force_hour=0)
+            rows+=session_rows(rng,split,2,"attack_v1",key,raw_id="SYNTH_demo_attacker",force_origin="NEW_NET",force_hour=2)
+            rows+=session_rows(rng,split,3,"lookalike_v1",key,raw_id="SYNTH_demo_admin",force_origin="KNOWN_NET",force_hour=2)
         else:
             count=max(1000,sessions) if split=="rare_test" else sessions
             n_attack=max(1,round(count*.03)) if split=="rare_test" else round(count*.4)
-            kinds=["attack","attack_lateral","attack_impact"]*(n_attack//3+1)
-            kinds=kinds[:n_attack]+["lookalike" if i%2 else "background" for i in range(count-n_attack)]
+            kinds=["attack_v1","attack_v2"]*(n_attack//2+1)
+            kinds=kinds[:n_attack]+["lookalike_v1" if i%2 else "benign" for i in range(count-n_attack)]
             rng.shuffle(kinds)
             for i,kind in enumerate(kinds):rows+=session_rows(rng,split,i,kind,key,split=="harder_test")
         rows.sort(key=lambda r:(r["timestamp"],r["event_id"]))
         name="demo_stream" if split=="demo" else split
         write_csv(output/f"{name}.csv",rows)
         write_csv(output/f"{name}_events.csv",rows,[x for x in FIELDS if x not in ["stage_label","scenario_id"]])
-        # Strict 13-column copy for callers that cannot yet accept operation.
+        # Compatibility alias; canonical files already have the exact 13 columns.
         write_csv(output/f"{name}_core.csv",rows,CORE_FIELDS)
         groups={}
         for row in rows:groups.setdefault(row["session_id"],[]).append(row)
