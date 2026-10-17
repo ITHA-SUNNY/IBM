@@ -1,0 +1,541 @@
+[
+  {
+    "evidence_id": "ev-0001",
+    "actor": "u-8a3f21",
+    "session_id": "s1",
+    "current_stage": "INITIAL_ACCESS",
+    "stage_confidence": 0.62,
+    "next_stage": "CREDENTIAL_ACCESS",
+    "next_confidence": 0.7,
+    "severity": "MEDIUM",
+    "indicators": [
+      {
+        "id": "NEW_ORIGIN",
+        "source": "SMF80",
+        "event_ids": [
+          "e0001"
+        ]
+      },
+      {
+        "id": "OFF_HOURS",
+        "source": "SMF80",
+        "event_ids": [
+          "e0001"
+        ]
+      }
+    ],
+    "top_events": [
+      {
+        "event_id": "e0001",
+        "contribution": 0.41,
+        "reason": "First logon from previously unseen origin network."
+      }
+    ],
+    "model_version": "threshold-hmm-gru v0.1.0-stub",
+    "conformal_set": [
+      "INITIAL_ACCESS"
+    ],
+    "ood_flag": false,
+    "after_event_id": "e0001"
+  },
+  {
+    "evidence_id": "ev-0002",
+    "actor": "u-8a3f21",
+    "session_id": "s1",
+    "current_stage": "CREDENTIAL_ACCESS",
+    "stage_confidence": 0.71,
+    "next_stage": "PRIVILEGE_ESCALATION",
+    "next_confidence": 0.7,
+    "severity": "HIGH",
+    "indicators": [
+      {
+        "id": "NEW_ORIGIN",
+        "source": "SMF80",
+        "event_ids": [
+          "e0001"
+        ]
+      },
+      {
+        "id": "MFA_FAILURE",
+        "source": "SMF80",
+        "event_ids": [
+          "e0002"
+        ]
+      },
+      {
+        "id": "OFF_HOURS",
+        "source": "SMF80",
+        "event_ids": [
+          "e0001"
+        ]
+      }
+    ],
+    "top_events": [
+      {
+        "event_id": "e0002",
+        "contribution": 0.38,
+        "reason": "MFA challenge failed before any success."
+      }
+    ],
+    "model_version": "threshold-hmm-gru v0.1.0-stub",
+    "conformal_set": [
+      "CREDENTIAL_ACCESS"
+    ],
+    "ood_flag": false,
+    "after_event_id": "e0002"
+  },
+  {
+    "evidence_id": "ev-0003",
+    "actor": "u-8a3f21",
+    "session_id": "s1",
+    "current_stage": "CREDENTIAL_ACCESS",
+    "stage_confidence": 0.8,
+    "next_stage": "PRIVILEGE_ESCALATION",
+    "next_confidence": 0.74,
+    "severity": "HIGH",
+    "indicators": [
+      {
+        "id": "AUTH_FAILURE_BURST",
+        "source": "SMF80",
+        "event_ids": [
+          "e0002"
+        ]
+      },
+      {
+        "id": "NEW_ORIGIN",
+        "source": "SMF80",
+        "event_ids": [
+          "e0001"
+        ]
+      },
+      {
+        "id": "OFF_HOURS",
+        "source": "SMF80",
+        "event_ids": [
+          "e0001"
+        ]
+      }
+    ],
+    "top_events": [
+      {
+        "event_id": "e0003",
+        "contribution": 0.35,
+        "reason": "Success immediately after a failure (fail-then-success)."
+      }
+    ],
+    "model_version": "threshold-hmm-gru v0.1.0-stub",
+    "conformal_set": [
+      "CREDENTIAL_ACCESS"
+    ],
+    "ood_flag": false,
+    "after_event_id": "e0003"
+  },
+  {
+    "evidence_id": "ev-0004",
+    "actor": "u-8a3f21",
+    "session_id": "s1",
+    "current_stage": "DISCOVERY",
+    "stage_confidence": 0.85,
+    "next_stage": "PRIVILEGE_ESCALATION",
+    "next_confidence": 0.81,
+    "severity": "HIGH",
+    "indicators": [
+      {
+        "id": "AUTH_FAILURE_BURST",
+        "source": "SMF80",
+        "event_ids": [
+          "e0002"
+        ]
+      },
+      {
+        "id": "NEW_ORIGIN",
+        "source": "SMF80",
+        "event_ids": [
+          "e0001"
+        ]
+      },
+      {
+        "id": "OFF_HOURS",
+        "source": "SMF80",
+        "event_ids": [
+          "e0001"
+        ]
+      }
+    ],
+    "top_events": [
+      {
+        "event_id": "e0004",
+        "contribution": 0.52,
+        "reason": "Catalogue enumeration shortly after login."
+      }
+    ],
+    "model_version": "threshold-hmm-gru v0.1.0-stub",
+    "conformal_set": [
+      "DISCOVERY"
+    ],
+    "ood_flag": false,
+    "after_event_id": "e0004"
+  },
+  {
+    "evidence_id": "ev-0005",
+    "actor": "u-8a3f21",
+    "session_id": "s1",
+    "current_stage": "DISCOVERY",
+    "stage_confidence": 0.87,
+    "next_stage": "PRIVILEGE_ESCALATION",
+    "next_confidence": 0.82,
+    "severity": "HIGH",
+    "indicators": [
+      {
+        "id": "AUTH_FAILURE_BURST",
+        "source": "SMF80",
+        "event_ids": [
+          "e0002"
+        ]
+      },
+      {
+        "id": "NEW_ORIGIN",
+        "source": "SMF80",
+        "event_ids": [
+          "e0001"
+        ]
+      },
+      {
+        "id": "OFF_HOURS",
+        "source": "SMF80",
+        "event_ids": [
+          "e0001"
+        ]
+      }
+    ],
+    "top_events": [
+      {
+        "event_id": "e0005",
+        "contribution": 0.55,
+        "reason": "Discovery sweep widens to many datasets."
+      }
+    ],
+    "model_version": "threshold-hmm-gru v0.1.0-stub",
+    "conformal_set": [
+      "DISCOVERY",
+      "PRIVILEGE_ESCALATION"
+    ],
+    "ood_flag": false,
+    "after_event_id": "e0005"
+  },
+  {
+    "evidence_id": "ev-0006",
+    "actor": "u-8a3f21",
+    "session_id": "s1",
+    "current_stage": "PRIVILEGE_ESCALATION",
+    "stage_confidence": 0.93,
+    "next_stage": "COLLECTION_EXFIL",
+    "next_confidence": 0.88,
+    "severity": "CRITICAL",
+    "indicators": [
+      {
+        "id": "NEW_ORIGIN",
+        "source": "SMF80",
+        "event_ids": [
+          "e0001"
+        ]
+      },
+      {
+        "id": "AUTH_FAILURE_BURST",
+        "source": "SMF80",
+        "event_ids": [
+          "e0002"
+        ]
+      },
+      {
+        "id": "PRIV_ATTR_GRANTED",
+        "source": "SMF80",
+        "event_ids": [
+          "e0006"
+        ]
+      },
+      {
+        "id": "TDZ_ANOMALY",
+        "source": "SMF83",
+        "event_ids": [
+          "e0006"
+        ]
+      }
+    ],
+    "top_events": [
+      {
+        "event_id": "e0006",
+        "contribution": 0.71,
+        "reason": "Self-granted SPECIAL attribute \u2014 classic escalation."
+      }
+    ],
+    "model_version": "threshold-hmm-gru v0.1.0-stub",
+    "conformal_set": [
+      "PRIVILEGE_ESCALATION"
+    ],
+    "ood_flag": false,
+    "after_event_id": "e0006"
+  },
+  {
+    "evidence_id": "ev-0007",
+    "actor": "u-8a3f21",
+    "session_id": "s1",
+    "current_stage": "COLLECTION_EXFIL",
+    "stage_confidence": 0.96,
+    "next_stage": "IMPACT",
+    "next_confidence": 0.9,
+    "severity": "CRITICAL",
+    "indicators": [
+      {
+        "id": "NEW_ORIGIN",
+        "source": "SMF80",
+        "event_ids": [
+          "e0001"
+        ]
+      },
+      {
+        "id": "AUTH_FAILURE_BURST",
+        "source": "SMF80",
+        "event_ids": [
+          "e0002"
+        ]
+      },
+      {
+        "id": "PRIV_ATTR_GRANTED",
+        "source": "SMF80",
+        "event_ids": [
+          "e0006"
+        ]
+      },
+      {
+        "id": "CROWN_JEWEL_ACCESS",
+        "source": "SMF98",
+        "event_ids": [
+          "e0007"
+        ]
+      },
+      {
+        "id": "TDZ_ANOMALY",
+        "source": "SMF83",
+        "event_ids": [
+          "e0006"
+        ]
+      }
+    ],
+    "top_events": [
+      {
+        "event_id": "e0007",
+        "contribution": 0.66,
+        "reason": "Read of a critical dataset never touched by this actor."
+      }
+    ],
+    "model_version": "threshold-hmm-gru v0.1.0-stub",
+    "conformal_set": [
+      "COLLECTION_EXFIL"
+    ],
+    "ood_flag": false,
+    "after_event_id": "e0007"
+  },
+  {
+    "evidence_id": "ev-0008",
+    "actor": "u-8a3f21",
+    "session_id": "s1",
+    "current_stage": "COLLECTION_EXFIL",
+    "stage_confidence": 0.97,
+    "next_stage": "IMPACT",
+    "next_confidence": 0.91,
+    "severity": "CRITICAL",
+    "indicators": [
+      {
+        "id": "CROWN_JEWEL_ACCESS",
+        "source": "SMF98",
+        "event_ids": [
+          "e0007"
+        ]
+      },
+      {
+        "id": "CROWN_JEWEL_ACCESS",
+        "source": "SMF98",
+        "event_ids": [
+          "e0008"
+        ]
+      },
+      {
+        "id": "PRIV_ATTR_GRANTED",
+        "source": "SMF80",
+        "event_ids": [
+          "e0006"
+        ]
+      },
+      {
+        "id": "TDZ_ANOMALY",
+        "source": "SMF83",
+        "event_ids": [
+          "e0006"
+        ]
+      }
+    ],
+    "top_events": [
+      {
+        "event_id": "e0008",
+        "contribution": 0.69,
+        "reason": "Volume of critical reads exceeds this actor's baseline."
+      }
+    ],
+    "model_version": "threshold-hmm-gru v0.1.0-stub",
+    "conformal_set": [
+      "COLLECTION_EXFIL",
+      "IMPACT"
+    ],
+    "ood_flag": false,
+    "after_event_id": "e0008"
+  },
+  {
+    "evidence_id": "ev-0009",
+    "actor": "u-1d7b90",
+    "session_id": "s2",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.55,
+    "next_stage": "INITIAL_ACCESS",
+    "next_confidence": 0.4,
+    "severity": "LOW",
+    "indicators": [
+      {
+        "id": "OFF_HOURS",
+        "source": "SMF80",
+        "event_ids": [
+          "e0009"
+        ]
+      }
+    ],
+    "top_events": [
+      {
+        "event_id": "e0009",
+        "contribution": 0.3,
+        "reason": "Off-hours logon, but from a known on-call network."
+      }
+    ],
+    "model_version": "threshold-hmm-gru v0.1.0-stub",
+    "conformal_set": [
+      "BENIGN",
+      "INITIAL_ACCESS"
+    ],
+    "ood_flag": false,
+    "after_event_id": "e0009"
+  },
+  {
+    "evidence_id": "ev-0010",
+    "actor": "u-1d7b90",
+    "session_id": "s2",
+    "current_stage": "BENIGN",
+    "stage_confidence": 0.58,
+    "next_stage": "PRIVILEGE_ESCALATION",
+    "next_confidence": 0.45,
+    "severity": "MEDIUM",
+    "indicators": [
+      {
+        "id": "OFF_HOURS",
+        "source": "SMF80",
+        "event_ids": [
+          "e0009"
+        ]
+      }
+    ],
+    "top_events": [
+      {
+        "event_id": "e0010",
+        "contribution": 0.22,
+        "reason": "Reads an operational runbook \u2014 consistent with on-call."
+      }
+    ],
+    "model_version": "threshold-hmm-gru v0.1.0-stub",
+    "conformal_set": [
+      "BENIGN",
+      "CREDENTIAL_ACCESS"
+    ],
+    "ood_flag": false,
+    "after_event_id": "e0010"
+  },
+  {
+    "evidence_id": "ev-0011",
+    "actor": "u-1d7b90",
+    "session_id": "s2",
+    "current_stage": "CREDENTIAL_ACCESS",
+    "stage_confidence": 0.62,
+    "next_stage": "PRIVILEGE_ESCALATION",
+    "next_confidence": 0.58,
+    "severity": "HIGH",
+    "indicators": [
+      {
+        "id": "OFF_HOURS",
+        "source": "SMF80",
+        "event_ids": [
+          "e0009"
+        ]
+      },
+      {
+        "id": "PRIV_ATTR_GRANTED",
+        "source": "SMF80",
+        "event_ids": [
+          "e0011"
+        ]
+      }
+    ],
+    "top_events": [
+      {
+        "event_id": "e0011",
+        "contribution": 0.44,
+        "reason": "Permission change during a change-management window."
+      }
+    ],
+    "model_version": "threshold-hmm-gru v0.1.0-stub",
+    "conformal_set": [
+      "BENIGN",
+      "CREDENTIAL_ACCESS",
+      "PRIVILEGE_ESCALATION"
+    ],
+    "ood_flag": false,
+    "after_event_id": "e0011"
+  },
+  {
+    "evidence_id": "ev-0012",
+    "actor": "u-1d7b90",
+    "session_id": "s2",
+    "current_stage": "DISCOVERY",
+    "stage_confidence": 0.6,
+    "next_stage": "PRIVILEGE_ESCALATION",
+    "next_confidence": 0.55,
+    "severity": "HIGH",
+    "indicators": [
+      {
+        "id": "OFF_HOURS",
+        "source": "SMF80",
+        "event_ids": [
+          "e0009"
+        ]
+      },
+      {
+        "id": "PRIV_ATTR_GRANTED",
+        "source": "SMF80",
+        "event_ids": [
+          "e0011"
+        ]
+      }
+    ],
+    "top_events": [
+      {
+        "event_id": "e0012",
+        "contribution": 0.31,
+        "reason": "Access to incident log \u2014 plausible for on-call work."
+      }
+    ],
+    "model_version": "threshold-hmm-gru v0.1.0-stub",
+    "conformal_set": [
+      "BENIGN",
+      "CREDENTIAL_ACCESS",
+      "DISCOVERY"
+    ],
+    "ood_flag": false,
+    "after_event_id": "e0012"
+  }
+]

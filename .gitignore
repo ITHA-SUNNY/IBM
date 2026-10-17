@@ -1,0 +1,9 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# M5 console runtime artifacts (regenerated on run)
+app/stubs/_working_audit.jsonl
+app/stubs/_tampered_audit.jsonl
