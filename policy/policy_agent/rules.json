@@ -1,12 +1,15 @@
 {
-  "policy_version": "1.0.0",
-  "description": "Threshold response policy. Rules are checked top to bottom and the first match wins. Edit thresholds here, not in code.",
+  "policy_version": "1.1.0",
+  "description": "Threshold response policy. Rules are checked top to bottom and the first match wins. Edit thresholds here, not in code: the act threshold is min_confidence 0.90 (P-02) and the early-warning threshold is min_next_confidence 0.75 (P-05).",
   "severity": {
     "resource_tiers": {
       "public": 1,
       "internal": 2,
       "restricted": 3,
-      "critical": 4
+      "critical": 4,
+      "low": 1,
+      "medium": 2,
+      "high": 3
     },
     "action_weights": {
       "login": 1,
@@ -17,7 +20,18 @@
       "delete": 3,
       "export": 3,
       "privilege_change": 3,
-      "credential_change": 4
+      "credential_change": 4,
+      "logon": 1,
+      "logoff": 1,
+      "mfa": 1,
+      "dataset_list": 1,
+      "racf_listuser": 1,
+      "dataset_read": 1,
+      "job_submit": 2,
+      "dataset_copy": 3,
+      "altuser_special": 3,
+      "permit": 3,
+      "password_change": 4
     },
     "privileged_actor_bonus": 1,
     "bands": {
@@ -26,16 +40,29 @@
       "MEDIUM": 3
     }
   },
+  "indicators": [
+    "new_origin",
+    "off_hours_activity",
+    "mfa_failure_then_success",
+    "privilege_change",
+    "sensitive_access",
+    "discovery_sweep"
+  ],
+  "stage_aliases": {
+    "none": "benign",
+    "exfiltration": "collection_exfil"
+  },
   "rules": [
     {
       "id": "P-01",
       "name": "Credential lock",
       "action": "LOCK_CREDENTIALS",
       "when": {
+        "threat_type_not_in": ["benign"],
         "severity_in": ["CRITICAL"],
         "min_confidence": 0.95,
         "min_indicators": 4,
-        "predicted_next_stage_in": ["exfiltration", "impact"]
+        "predicted_next_stage_in": ["collection_exfil", "impact"]
       },
       "description": "Critical severity, very strong evidence and a predicted move to exfiltration or impact: lock the credentials."
     },
@@ -44,6 +71,7 @@
       "name": "Session revoke",
       "action": "REVOKE_SESSION",
       "when": {
+        "threat_type_not_in": ["benign"],
         "severity_in": ["CRITICAL"],
         "min_confidence": 0.90,
         "min_indicators": 3
@@ -64,6 +92,7 @@
       "name": "High severity, strong evidence",
       "action": "ALERT_ANALYST",
       "when": {
+        "threat_type_not_in": ["benign"],
         "severity_in": ["HIGH"],
         "min_confidence": 0.90,
         "min_indicators": 3
@@ -75,8 +104,8 @@
       "name": "Early warning",
       "action": "EARLY_WARNING",
       "when": {
-        "predicted_next_stage_in": ["lateral_movement", "exfiltration", "impact"],
-        "min_confidence": 0.75
+        "predicted_next_stage_in": ["privilege_escalation", "lateral_movement", "collection_exfil", "impact"],
+        "min_next_confidence": 0.75
       },
       "description": "The sequence is predicted to reach a serious stage but no action threshold is met yet: warn the operator."
     }

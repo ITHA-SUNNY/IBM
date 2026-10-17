@@ -7,6 +7,10 @@ Severity is deliberately NOT a field the model controls. The model supplies the
 *context* (what resource, what action, privileged or not) and the policy agent
 computes severity from fixed rules. If an upstream component sends its own
 "severity" key it is kept for the audit trail but ignored for the decision.
+
+`confidence` is the model's confidence in the current stage (`threat_type`).
+`next_confidence` is its confidence in `predicted_next_stage`; it is optional
+and falls back to `confidence` when absent.
 """
 from __future__ import annotations
 
@@ -30,13 +34,26 @@ REQUIRED_FIELDS = (
     "action",
     "is_privileged_actor",
 )
-OPTIONAL_FIELDS = ("session_id",)
+OPTIONAL_FIELDS = ("session_id", "next_confidence")
 KNOWN_FIELDS = REQUIRED_FIELDS + OPTIONAL_FIELDS
 
 
 def canonical_json(obj: Any) -> str:
-    """Stable JSON text, used for hashing and for the audit log."""
-    return json.dumps(obj, sort_keys=True, separators=(",", ":"), default=str)
+    """Stable JSON text, used for hashing and for the audit log.
+
+    Same form as the shared audit contract (app/contracts.py): sorted keys,
+    compact separators, UTF-8 kept as-is.
+    """
+    return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str)
+
+
+def _probability(value: Any) -> bool:
+    return (
+        not isinstance(value, bool)
+        and isinstance(value, (int, float))
+        and math.isfinite(value)
+        and 0.0 <= value <= 1.0
+    )
 
 
 def sha256_hex(text: str) -> str:
@@ -75,6 +92,7 @@ class EvidenceObject:
     action: str
     is_privileged_actor: bool
     session_id: Optional[str] = None
+    next_confidence: Optional[float] = None
     extras: Dict[str, Any] = field(default_factory=dict)
 
     @property
@@ -117,16 +135,17 @@ class EvidenceObject:
 
         confidence: Optional[float] = None
         if "confidence" in data:
-            c = data["confidence"]
-            if (
-                isinstance(c, bool)
-                or not isinstance(c, (int, float))
-                or not math.isfinite(c)
-                or not 0.0 <= c <= 1.0
-            ):
+            if not _probability(data["confidence"]):
                 problems.append("confidence must be a number between 0 and 1")
             else:
-                confidence = float(c)
+                confidence = float(data["confidence"])
+
+        next_confidence: Optional[float] = None
+        if data.get("next_confidence") is not None:
+            if not _probability(data["next_confidence"]):
+                problems.append("next_confidence must be a number between 0 and 1 when provided")
+            else:
+                next_confidence = float(data["next_confidence"])
 
         indicators: Optional[List[str]] = None
         if "indicators" in data:
@@ -172,6 +191,7 @@ class EvidenceObject:
             action=normalize_token(action),
             is_privileged_actor=privileged,
             session_id=session_id,
+            next_confidence=next_confidence,
             extras={k: v for k, v in data.items() if k not in KNOWN_FIELDS},
         )
 
@@ -182,6 +202,7 @@ class EvidenceObject:
             "timestamp": self.timestamp,
             "threat_type": self.threat_type,
             "confidence": self.confidence,
+            "next_confidence": self.next_confidence,
             "predicted_next_stage": self.predicted_next_stage,
             "indicators": list(self.indicators),
             "indicator_count": self.indicator_count,

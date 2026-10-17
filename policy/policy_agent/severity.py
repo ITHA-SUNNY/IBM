@@ -6,7 +6,7 @@ confidence can never raise or lower severity.
 """
 from __future__ import annotations
 
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from .errors import EvidenceError, PolicyConfigError
 from .evidence import normalize_token
@@ -84,3 +84,37 @@ class SeverityModel:
             if score >= threshold:
                 return label, score
         return "LOW", score
+
+    def highest_risk_event(self, events: List[Dict]) -> Tuple[str, str, Optional[str]]:
+        """(resource_tier, action, event_id) of the highest-risk event in a window.
+
+        Events use the events.csv contract (event_type, sensitivity, outcome).
+        Successful events are preferred; if none succeeded, all are considered.
+        Ties go to the latest event. Unknown vocabulary raises EvidenceError, so
+        the caller fails safe rather than under-scoring an unrecognised event.
+        """
+        if not isinstance(events, list) or not events:
+            raise EvidenceError("no observed events to judge severity on")
+        problems: List[str] = []
+        scored = []
+        for e in events:
+            if not isinstance(e, dict):
+                problems.append("each event must be a JSON object")
+                continue
+            tier = normalize_token(str(e.get("sensitivity") or ""))
+            action = normalize_token(str(e.get("event_type") or ""))
+            if tier not in self.tiers:
+                problems.append(f"event {e.get('event_id')}: unknown sensitivity '{e.get('sensitivity')}'")
+            if action not in self.actions:
+                problems.append(f"event {e.get('event_id')}: unknown event_type '{e.get('event_type')}'")
+            if tier in self.tiers and action in self.actions:
+                ok = str(e.get("outcome", "")).strip().upper() == "SUCCESS"
+                scored.append((ok, self.tiers[tier] + self.actions[action], tier, action, e.get("event_id")))
+        if problems:
+            raise EvidenceError(problems)
+        pool = [s for s in scored if s[0]] or scored
+        best = None
+        for item in pool:
+            if best is None or item[1] >= best[1]:
+                best = item
+        return best[2], best[3], best[4]

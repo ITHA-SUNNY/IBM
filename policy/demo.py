@@ -74,7 +74,7 @@ def main() -> None:
 
     banner("5. Audit replay: 'show me why this account was revoked' (jmartinez)")
     entry = AuditLog(str(audit_path)).replay(actor_id="jmartinez")[0]
-    print(f"  entry #{entry['seq']} logged {entry['logged_at']}  (policy v{entry['policy_version']})")
+    print(f"  entry #{entry['seq']} logged {entry['ts']}  (policy v{entry['policy_version']})")
     print(f"  evidence hash : {entry['evidence_hash'][:24]}...")
     print(f"  indicators    : {', '.join(entry['evidence']['indicators'])}")
     print(f"  decision      : {entry['decision']['action']} via {entry['decision']['rule_id']} "
