@@ -198,7 +198,7 @@ def plot_reliability_diagrams(
                 )
 
         # Sleek, single-line metrics banner in upper left (completely outside bar region)
-        badge_text = f"ECE: {ece_val:.2f}%  |  Temp T = {temp:.2f}  |  Active Bins: {np.sum(active)}/10"
+        badge_text = f"ECE: {ece_val:.2f}%  |  Temp T = {temp:.2f}"
         ax.text(
             0.03,
             0.94,
