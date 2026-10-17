@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "seed": 42,
+  "synthetic_only": true,
+  "public_demo_key": true,
+  "splits": {
+    "train": {
+      "sessions": 400,
+      "events": 3442,
+      "stages": [
+        "BENIGN",
+        "COLLECTION_EXFIL",
+        "CREDENTIAL_ACCESS",
+        "DISCOVERY",
+        "IMPACT",
+        "INITIAL_ACCESS",
+        "LATERAL_MOVEMENT",
+        "PRIVILEGE_ESCALATION"
+      ]
+    },
+    "validation": {
+      "sessions": 400,
+      "events": 3476,
+      "stages": [
+        "BENIGN",
+        "COLLECTION_EXFIL",
+        "CREDENTIAL_ACCESS",
+        "DISCOVERY",
+        "IMPACT",
+        "INITIAL_ACCESS",
+        "LATERAL_MOVEMENT",
+        "PRIVILEGE_ESCALATION"
+      ]
+    },
+    "test": {
+      "sessions": 400,
+      "events": 3463,
+      "stages": [
+        "BENIGN",
+        "COLLECTION_EXFIL",
+        "CREDENTIAL_ACCESS",
+        "DISCOVERY",
+        "IMPACT",
+        "INITIAL_ACCESS",
+        "LATERAL_MOVEMENT",
+        "PRIVILEGE_ESCALATION"
+      ]
+    },
+    "harder_test": {
+      "sessions": 400,
+      "events": 3864,
+      "stages": [
+        "BENIGN",
+        "COLLECTION_EXFIL",
+        "CREDENTIAL_ACCESS",
+        "DISCOVERY",
+        "IMPACT",
+        "INITIAL_ACCESS",
+        "LATERAL_MOVEMENT",
+        "PRIVILEGE_ESCALATION"
+      ]
+    },
+    "demo": {
+      "sessions": 2,
+      "events": 16,
+      "stages": [
+        "BENIGN",
+        "COLLECTION_EXFIL",
+        "CREDENTIAL_ACCESS",
+        "DISCOVERY",
+        "INITIAL_ACCESS",
+        "PRIVILEGE_ESCALATION"
+      ]
+    }
+  }
+}

@@ -22,3 +22,9 @@ IBM Z Datathon 2026 · Track: AI Secured: Innovation Without Exposure
 
 3. **audit.jsonl** (M4 produces it; M5 and M6 read it):
    `seq, ts, evidence_id, rule_fired, action, policy_version, prev_hash, entry_hash`
+
+## M2 data
+Run: python data/generate.py
+Verify: python data/verify_data.py
+See data/event_vocab.md for the CSV contract and integration notes.
+
