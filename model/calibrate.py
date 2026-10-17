@@ -136,80 +136,94 @@ def plot_reliability_diagrams(
 ):
     """
     Plot and save 2x2 comparison reliability diagrams before and after temperature scaling.
-    Uses clean bar labels and inset summary cards to avoid text overlap.
+    Uses clean non-overlapping bars, shaded calibration gaps, and top-corner metrics badges.
     """
-    fig, axes = plt.subplots(2, 2, figsize=(14, 11))
-    fig.suptitle("Reliability & Calibration Diagrams (10-Bin ECE) — Threshold M3", fontsize=16, fontweight="bold", y=0.98)
+    fig, axes = plt.subplots(2, 2, figsize=(15, 12), dpi=250)
+    fig.patch.set_facecolor('#ffffff')
+    fig.suptitle(
+        "Dual-Head Reliability & Calibration Assessment (10-Bin ECE) — Threshold M3",
+        fontsize=16,
+        fontweight="bold",
+        y=0.98,
+        color="#1f2937"
+    )
 
     plots_config = [
-        (axes[0, 0], current_uncal, "Current Stage: Uncalibrated (T=1.00)", "#d9534f"),
-        (axes[0, 1], current_cal, f"Current Stage: Calibrated (T={t_current:.2f})", "#5cb85c"),
-        (axes[1, 0], next_uncal, "Next Stage: Uncalibrated (T=1.00)", "#f0ad4e"),
-        (axes[1, 1], next_cal, f"Next Stage: Calibrated (T={t_next:.2f})", "#0275d8"),
+        (axes[0, 0], current_uncal, "Current Stage: Uncalibrated (T=1.00)", 1.00, "#ef4444"),
+        (axes[0, 1], current_cal, f"Current Stage: Calibrated (T={t_current:.2f})", t_current, "#10b981"),
+        (axes[1, 0], next_uncal, "Next Stage: Uncalibrated (T=1.00)", 1.00, "#f59e0b"),
+        (axes[1, 1], next_cal, f"Next Stage: Calibrated (T={t_next:.2f})", t_next, "#2563eb"),
     ]
 
-    for ax, details, title, bar_color in plots_config:
+    for ax, details, title, temp, bar_color in plots_config:
+        ax.set_facecolor("#fafbfc")
         centers = np.array(details["bin_centers"])
         accs = np.array(details["bin_accs"])
         confs = np.array(details["bin_confs"])
         counts = np.array(details["bin_counts"])
-        ece_val = details["ece"]
+        ece_val = details["ece"] * 100
         
         # Plot diagonal ideal line
-        ax.plot([0, 1], [0, 1], "k--", linewidth=1.8, label="Ideal (Accuracy = Confidence)")
+        ax.plot([0, 1], [0, 1], "--", color="#4b5563", linewidth=2.0, label="Perfect Calibration ($y = x$)", zorder=3)
+        
+        active = counts > 0
+        width = 0.075
+
+        # Shaded calibration gap
+        for c, a in zip(confs[active], accs[active]):
+            low = min(c, a)
+            high = max(c, a)
+            ax.fill_between([c - width/2, c + width/2], low, high, color="#fca5a5", alpha=0.45, hatch="//", zorder=2)
         
         # Plot empirical accuracy bars
-        bars = ax.bar(centers, accs, width=0.075, alpha=0.65, color=bar_color, edgecolor="black", label="Empirical Accuracy")
+        bars = ax.bar(confs[active], accs[active], width=width, alpha=0.85, color=bar_color, edgecolor="#1f2937", linewidth=1.2, label="Empirical Accuracy", zorder=4)
         
-        # Annotate bars cleanly
-        active = counts > 0
-        bin_lines = []
-
         if np.any(active):
-            # Scatter points for actual (confidence, accuracy)
-            ax.scatter(confs[active], accs[active], color="black", s=60, zorder=5, marker="o", label="Observed (Conf, Acc)")
+            ax.scatter(confs[active], accs[active], color="#111827", s=50, zorder=6, edgecolors="white", linewidth=1.5, label="Observed (Conf, Acc)")
             
-            active_bars = [b for b, cnt in zip(bars, counts) if cnt > 0]
-            for c_val, a_val, bar in zip(confs[active], accs[active], active_bars):
-                gap_pct = abs(c_val - a_val) * 100
-                # Label above the bar
+            for bar, a, cnt in zip(bars, accs[active], counts[active]):
+                height = bar.get_height()
+                y_pos = height + 0.02 if height < 0.90 else height - 0.06
+                text_col = "#111827" if height < 0.90 else "#ffffff"
                 ax.text(
                     bar.get_x() + bar.get_width() / 2.0,
-                    a_val + 0.02,
-                    f"{a_val*100:.1f}%",
+                    y_pos,
+                    f"{a*100:.0f}%\n(n={cnt})",
                     ha="center",
-                    va="bottom",
-                    fontsize=9,
-                    fontweight="bold"
+                    va="bottom" if height < 0.90 else "top",
+                    fontsize=8.5,
+                    fontweight="bold",
+                    color=text_col,
+                    zorder=7
                 )
-                bin_lines.append(f"• Conf: {c_val*100:.1f}% → Acc: {a_val*100:.1f}% (Gap: {gap_pct:.1f}%)")
 
-        # Inset summary card in upper-left to eliminate any collision with bars
-        card_text = "Active Bin Breakdown:\n" + "\n".join(bin_lines) + f"\n\nOverall ECE: {ece_val*100:.2f}%"
+        # Sleek, single-line metrics banner in upper left (completely outside bar region)
+        badge_text = f"ECE: {ece_val:.2f}%  |  Temp T = {temp:.2f}  |  Active Bins: {np.sum(active)}/10"
         ax.text(
-            0.04,
-            0.78,
-            card_text,
+            0.03,
+            0.94,
+            badge_text,
             transform=ax.transAxes,
-            fontsize=9,
-            verticalalignment="top",
-            fontfamily="sans-serif",
-            bbox=dict(boxstyle="round,pad=0.5", facecolor="#f8f9fa", edgecolor="#ced4da", alpha=0.95, lw=1.2)
+            fontsize=10,
+            fontweight="bold",
+            color="#1e293b",
+            bbox=dict(boxstyle="round,pad=0.45", facecolor="#ffffff", edgecolor="#cbd5e1", alpha=0.95, lw=1.2),
+            zorder=8
         )
 
-        ax.set_xlim([0.0, 1.05])
-        ax.set_ylim([0.0, 1.15])
-        ax.set_xlabel("Confidence Level", fontsize=11, fontweight="semibold")
-        ax.set_ylabel("Observed Real Accuracy", fontsize=11, fontweight="semibold")
-        ax.set_title(f"{title}\nECE Error = {ece_val*100:.2f}%", fontsize=12, fontweight="bold")
-        ax.legend(loc="lower right", fontsize=9, framealpha=0.9)
-        ax.grid(True, linestyle=":", alpha=0.6)
+        ax.set_xlim([0.0, 1.02])
+        ax.set_ylim([0.0, 1.12])
+        ax.set_xlabel("Mean Confidence Score", fontsize=11, fontweight="bold", color="#334155")
+        ax.set_ylabel("Empirical Accuracy", fontsize=11, fontweight="bold", color="#334155")
+        ax.set_title(f"{title}", fontsize=12, fontweight="bold", pad=10, color="#1e293b")
+        ax.legend(loc="lower right", fontsize=9, framealpha=0.95, facecolor="#ffffff", edgecolor="#cbd5e1")
+        ax.grid(True, linestyle=":", alpha=0.5, color="#94a3b8")
 
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
-    plt.savefig(output_path, dpi=200)
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.close()
-    print(f"Enhanced non-overlapping reliability diagram saved to: {output_path}")
+    print(f"Clean, non-overlapping reliability diagram saved to: {output_path}")
 
 
 def calibrate(
