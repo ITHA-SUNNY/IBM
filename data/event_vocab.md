@@ -1,28 +1,50 @@
-# M2 event vocabulary and handoff
+# M2 event vocabulary v2 and handoff
 
-Generate: `python data/generate.py --seed 42 --sessions 400` (Python stdlib only).
+Run `python data/generate.py`; verify with `python data/verify_data.py`. Python standard library only.
 
-Required CSV columns, in shared-contract order:
-`event_id,timestamp,system_id,actor_id,session_id,event_type,outcome,resource,sensitivity,origin,off_hours,stage_label,scenario_id`
+## Schema status
+
+The exact data/schema.py referenced in chat was not present on any accessible remote branch when checked. These values implement Vinayak's stated changes; full schema compatibility is pending his file/link. Do not claim it is already validated against that file.
+
+CSV columns: event_id,timestamp,system_id,actor_id,session_id,event_type,outcome,resource,sensitivity,origin,off_hours,stage_label,scenario_id,operation.
+
+The first 13 columns retain the shared contract; operation is an additive field required to distinguish listing, reading and copying. Strict 13-column `_core.csv` copies are provided for temporary compatibility, but they lose operation detail. Consumers should use column names and read the full files.
 
 - event_type: LOGON, MFA, DATASET_ACCESS, ALTUSER_SPECIAL, COMMAND_EXEC, CRYPTO_OP, LOGOFF
-- outcome: SUCCESS, FAIL
-- sensitivity: INTERNAL, HIGH, CRITICAL (HIGH is reserved; current generator emits INTERNAL/CRITICAL)
-- origin: NEW_NET, KNOWN_NET
-- off_hours: True, False (CSV strings; parse explicitly, never bool("False"))
+- outcome: SUCCESS, FAILURE
+- sensitivity: LOW, MEDIUM, HIGH (HIGH maps former CRITICAL; MEDIUM maps former INTERNAL dataset access)
+- off_hours: integer 0 or 1; relative to UTC in this simulation, outside 06:00?21:59. This is a calendar flag, not deviation from a per-user schedule.
+- origin: NEW_NET, KNOWN_NET, independent of ground-truth class; no literal IPs.
+- actor_id: U_ plus 12 lowercase hexadecimal digits of HMAC-SHA256.
 - stage_label: BENIGN, INITIAL_ACCESS, CREDENTIAL_ACCESS, DISCOVERY, PRIVILEGE_ESCALATION, LATERAL_MOVEMENT, COLLECTION_EXFIL, IMPACT
-- scenario_id: background, lookalike, attack, attack_lateral, attack_impact
-- timestamp: UTC ISO 8601 with Z; system_id: SYS1, SYS2.
-- actor_id: keyed HMAC-SHA256 pseudonym, truncated to 24 hex digits; raw synthetic identities are never exported.
+- scenario_id: background, lookalike, attack, attack_lateral, attack_impact, baseline (demo only)
 
-Files: train.csv, validation.csv, test.csv, harder_test.csv; demo_stream.csv contains exactly one basic attack and one legitimate look-alike. Training includes lateral and impact variants to represent all eight stages. These extra variants are synthetic extensions, not additional live demos.
+## Event semantics
 
-Each file also has an `_events.csv` copy without stage_label/scenario_id for inference and a `_labels.csv` sidecar for evaluation. Labels must never enter model features. IDs also must not become predictive features. Use train for fitting and validation for calibration. Keep test and harder_test untouched until evaluation.
+DATASET_ACCESS is a resource request. operation distinguishes LIST (directory/catalog enumeration), READ (content retrieval), COPY (synthetic bulk transfer), WRITE (content modification). Listing is NOT the same observation as reading/copying. Repeated listings across resources followed by a privileged change and repeated high-sensitivity copies define the authored attack chain; they are not proof of exfiltration in production.
 
-Sidecar next_stage_label means next DIFFERENT stage; if none exists it stays at the current stage, keeping the fixed eight-class vocabulary. Confirm this convention with M3 before training. It is not necessarily the next event's label.
+COMMAND_EXEC means a synthetic command/program invocation. operation: BATCH_JOB, EMERGENCY_FIX, ROUTINE_STATUS. CRYPTO_OP means an abstract cryptographic operation, KEY_ROTATE or BULK_ENCRYPT, NOT an actual ICSF record parser. Legitimate crypto and copying are included. Other operations: AUTHENTICATE (LOGON), CHALLENGE (MFA), GRANT_SPECIAL (ALTUSER_SPECIAL), END_SESSION (LOGOFF). Resource names are shared across classes.
 
-Use validation for temperature scaling, with policy tuning on a separate partition of train. Splits have disjoint sessions and actors. Same seed and key reproduce identical bytes. Default key is PUBLIC and intended only for invented data. For actual identities set THRESHOLD_HMAC_KEY to a private secret without committing it; production key management is outside this prototype.
+## Files and targets
 
-Known limitations: all data is synthetic normalized telemetry, not a verified SMF binary mapping. Class balance is artificial (60% attack), and easy scenario signals can inflate accuracy. Harder test adds benign noise, slow pacing and new-origin legitimate sessions; it does not demonstrate unseen attack-family generalization. Synthetic ECE does not establish calibration at enterprise prevalence. No fixed-confidence results or desired policy outcomes are manufactured.
+`data/demo_stream.csv` on this branch is the canonical M2 demo for M5. It has four sessions: two short BENIGN baselines using the same two actors, followed by one attack and one legitimate look-alike. Baselines precede both main sessions; admin origin remains KNOWN_NET. M5 can label the first two sessions as history. Session-level model replay must not combine the two actors; retain actor history across sessions only for baseline features.
 
-Integration warnings observed on origin/main: predict.py is still a stub with fixed confidence. predict_stream currently treats all rows as one session; caller must group by actor/session before replay. M3 emits actor/current_stage/stage_confidence whereas policy_agent requires actor_id/timestamp/threat_type/confidence/predicted_next_stage/resource_tier/action/is_privileged_actor. M1/M3/M4 must agree an adapter before the live demo. Do not claim the real model-policy chain works from stub results.
+train.csv, validation.csv and test.csv have independent actors/sessions and 40% attack sessions to exercise all classes, not to estimate operational prevalence. harder_test.csv is also independent and adds 4x pacing, 2?4 neutral events, optional failed privilege probes and within-DISCOVERY listing-order shuffles. It does NOT reverse causal stages or establish unseen-family generalization. Benign new origins and off-hours exist in every split, not just harder_test.
+
+rare_test.csv has 1,000 sessions with 30 attacks (3%). Report benign false-positive rate as false positives / benign sessions, and precision with the prevalence stated. Rare prevalence changes precision; it does not alone repair model validity. Do not tune on this split.
+
+Each dataset has `_events.csv` without stage_label/scenario_id and `_labels.csv` for targets. Never train on labels, identifiers or scenario_id as features. Sidecar next_stage_label means next DIFFERENT stage; without a later change it remains the current stage. M3 must confirm this convention.
+
+## Privacy and reproducibility
+
+Raw IDs are invented: SYNTH_<split>_<index padded to 5 digits>; demo uses SYNTH_demo_attacker and SYNTH_demo_admin for both baseline and main session. They are HMAC'd before export. There are no real identities, no exported raw-ID mapping and no cross-split actor overlap. Demo intentionally repeats actors within its own split.
+
+THRESHOLD_HMAC_KEY supplies a private secret, or the CLI creates a random 32-byte local data/.hmac_key, ignored by Git. Do not commit/share that key. The prior public demonstration key has been replaced; IDs changed. Reproducibility requires the same seed AND key. Teammates without the key can consume checked-in CSVs or regenerate their own consistent pseudonyms; they should not expect byte-identical IDs. The manifest exposes only a key fingerprint.
+
+## Expected benign behavior and limits
+
+A legitimate NEW_NET admin is still labeled BENIGN. New origin or off-hours alone must not cause containment; if model confidence is uncertain, policy should route to an analyst. These are acceptance goals, not guaranteed model outputs. Benign and attack sequences deliberately overlap. Synthetic stage labels are authored ground truth; accuracy does not establish real enterprise protection. Hold out test/harder/rare data from fitting, calibration and policy tuning.
+
+## Integration warning
+
+Current origin/main predict.py remains a fixed-confidence stub; it groups an entire stream as one prefix, so its caller must group by actor/session. It cannot establish calibrated performance. M3's evidence contract still differs from policy_agent's required fields; M1/M3/M4 must align an adapter. FAILURE/LOW-MEDIUM-HIGH/0-1 replace earlier vocabulary; old trained models need regeneration/retraining, not silent reuse. M3 should consume operation to distinguish discovery from content access.

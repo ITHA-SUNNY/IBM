@@ -27,4 +27,3 @@ IBM Z Datathon 2026 · Track: AI Secured: Innovation Without Exposure
 Run: python data/generate.py
 Verify: python data/verify_data.py
 See data/event_vocab.md for the CSV contract and integration notes.
-

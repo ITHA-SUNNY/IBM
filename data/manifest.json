@@ -1,12 +1,15 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "seed": 42,
   "synthetic_only": true,
-  "public_demo_key": true,
+  "hmac_key_fingerprint": "9b36053090d6",
   "splits": {
     "train": {
       "sessions": 400,
-      "events": 3442,
+      "events": 3921,
+      "malicious_sessions": 160,
+      "attack_prevalence": 0.4,
+      "actors": 400,
       "stages": [
         "BENIGN",
         "COLLECTION_EXFIL",
@@ -16,11 +19,41 @@
         "INITIAL_ACCESS",
         "LATERAL_MOVEMENT",
         "PRIVILEGE_ESCALATION"
-      ]
+      ],
+      "scenario_counts": {
+        "background": {
+          "sessions": 120,
+          "new_net": 41,
+          "off_hours": 63
+        },
+        "lookalike": {
+          "sessions": 120,
+          "new_net": 46,
+          "off_hours": 56
+        },
+        "attack_lateral": {
+          "sessions": 53,
+          "new_net": 16,
+          "off_hours": 28
+        },
+        "attack": {
+          "sessions": 54,
+          "new_net": 23,
+          "off_hours": 29
+        },
+        "attack_impact": {
+          "sessions": 53,
+          "new_net": 21,
+          "off_hours": 25
+        }
+      }
     },
     "validation": {
       "sessions": 400,
-      "events": 3476,
+      "events": 3879,
+      "malicious_sessions": 160,
+      "attack_prevalence": 0.4,
+      "actors": 400,
       "stages": [
         "BENIGN",
         "COLLECTION_EXFIL",
@@ -30,11 +63,41 @@
         "INITIAL_ACCESS",
         "LATERAL_MOVEMENT",
         "PRIVILEGE_ESCALATION"
-      ]
+      ],
+      "scenario_counts": {
+        "attack": {
+          "sessions": 54,
+          "new_net": 17,
+          "off_hours": 26
+        },
+        "background": {
+          "sessions": 120,
+          "new_net": 40,
+          "off_hours": 61
+        },
+        "lookalike": {
+          "sessions": 120,
+          "new_net": 52,
+          "off_hours": 66
+        },
+        "attack_lateral": {
+          "sessions": 53,
+          "new_net": 20,
+          "off_hours": 25
+        },
+        "attack_impact": {
+          "sessions": 53,
+          "new_net": 24,
+          "off_hours": 23
+        }
+      }
     },
     "test": {
       "sessions": 400,
-      "events": 3463,
+      "events": 3882,
+      "malicious_sessions": 160,
+      "attack_prevalence": 0.4,
+      "actors": 400,
       "stages": [
         "BENIGN",
         "COLLECTION_EXFIL",
@@ -44,11 +107,41 @@
         "INITIAL_ACCESS",
         "LATERAL_MOVEMENT",
         "PRIVILEGE_ESCALATION"
-      ]
+      ],
+      "scenario_counts": {
+        "lookalike": {
+          "sessions": 120,
+          "new_net": 44,
+          "off_hours": 46
+        },
+        "attack_lateral": {
+          "sessions": 53,
+          "new_net": 19,
+          "off_hours": 29
+        },
+        "attack": {
+          "sessions": 54,
+          "new_net": 25,
+          "off_hours": 24
+        },
+        "background": {
+          "sessions": 120,
+          "new_net": 53,
+          "off_hours": 68
+        },
+        "attack_impact": {
+          "sessions": 53,
+          "new_net": 20,
+          "off_hours": 28
+        }
+      }
     },
     "harder_test": {
       "sessions": 400,
-      "events": 3864,
+      "events": 5171,
+      "malicious_sessions": 160,
+      "attack_prevalence": 0.4,
+      "actors": 400,
       "stages": [
         "BENIGN",
         "COLLECTION_EXFIL",
@@ -58,11 +151,85 @@
         "INITIAL_ACCESS",
         "LATERAL_MOVEMENT",
         "PRIVILEGE_ESCALATION"
-      ]
+      ],
+      "scenario_counts": {
+        "lookalike": {
+          "sessions": 120,
+          "new_net": 47,
+          "off_hours": 58
+        },
+        "background": {
+          "sessions": 120,
+          "new_net": 44,
+          "off_hours": 60
+        },
+        "attack_lateral": {
+          "sessions": 53,
+          "new_net": 22,
+          "off_hours": 27
+        },
+        "attack": {
+          "sessions": 54,
+          "new_net": 24,
+          "off_hours": 26
+        },
+        "attack_impact": {
+          "sessions": 53,
+          "new_net": 22,
+          "off_hours": 31
+        }
+      }
+    },
+    "rare_test": {
+      "sessions": 1000,
+      "events": 6910,
+      "malicious_sessions": 30,
+      "attack_prevalence": 0.03,
+      "actors": 1000,
+      "stages": [
+        "BENIGN",
+        "COLLECTION_EXFIL",
+        "CREDENTIAL_ACCESS",
+        "DISCOVERY",
+        "IMPACT",
+        "INITIAL_ACCESS",
+        "LATERAL_MOVEMENT",
+        "PRIVILEGE_ESCALATION"
+      ],
+      "scenario_counts": {
+        "lookalike": {
+          "sessions": 485,
+          "new_net": 191,
+          "off_hours": 254
+        },
+        "attack": {
+          "sessions": 10,
+          "new_net": 5,
+          "off_hours": 3
+        },
+        "background": {
+          "sessions": 485,
+          "new_net": 199,
+          "off_hours": 256
+        },
+        "attack_lateral": {
+          "sessions": 10,
+          "new_net": 3,
+          "off_hours": 3
+        },
+        "attack_impact": {
+          "sessions": 10,
+          "new_net": 5,
+          "off_hours": 6
+        }
+      }
     },
     "demo": {
-      "sessions": 2,
-      "events": 16,
+      "sessions": 4,
+      "events": 28,
+      "malicious_sessions": 1,
+      "attack_prevalence": 0.25,
+      "actors": 2,
       "stages": [
         "BENIGN",
         "COLLECTION_EXFIL",
@@ -70,7 +237,24 @@
         "DISCOVERY",
         "INITIAL_ACCESS",
         "PRIVILEGE_ESCALATION"
-      ]
+      ],
+      "scenario_counts": {
+        "baseline": {
+          "sessions": 2,
+          "new_net": 0,
+          "off_hours": 2
+        },
+        "lookalike": {
+          "sessions": 1,
+          "new_net": 0,
+          "off_hours": 1
+        },
+        "attack": {
+          "sessions": 1,
+          "new_net": 1,
+          "off_hours": 1
+        }
+      }
     }
   }
 }
