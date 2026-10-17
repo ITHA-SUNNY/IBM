@@ -1,0 +1,88 @@
+{
+  "policy_version": "1.0.0",
+  "description": "Threshold response policy. Rules are checked top to bottom and the first match wins. Edit thresholds here, not in code.",
+  "severity": {
+    "resource_tiers": {
+      "public": 1,
+      "internal": 2,
+      "restricted": 3,
+      "critical": 4
+    },
+    "action_weights": {
+      "login": 1,
+      "read": 1,
+      "write": 2,
+      "command_exec": 2,
+      "crypto_op": 2,
+      "delete": 3,
+      "export": 3,
+      "privilege_change": 3,
+      "credential_change": 4
+    },
+    "privileged_actor_bonus": 1,
+    "bands": {
+      "CRITICAL": 6,
+      "HIGH": 4,
+      "MEDIUM": 3
+    }
+  },
+  "rules": [
+    {
+      "id": "P-01",
+      "name": "Credential lock",
+      "action": "LOCK_CREDENTIALS",
+      "when": {
+        "severity_in": ["CRITICAL"],
+        "min_confidence": 0.95,
+        "min_indicators": 4,
+        "predicted_next_stage_in": ["exfiltration", "impact"]
+      },
+      "description": "Critical severity, very strong evidence and a predicted move to exfiltration or impact: lock the credentials."
+    },
+    {
+      "id": "P-02",
+      "name": "Session revoke",
+      "action": "REVOKE_SESSION",
+      "when": {
+        "severity_in": ["CRITICAL"],
+        "min_confidence": 0.90,
+        "min_indicators": 3
+      },
+      "description": "Critical severity with high confidence and at least three independent indicators: revoke the session."
+    },
+    {
+      "id": "P-03",
+      "name": "Critical, evidence not enough to act",
+      "action": "ALERT_ANALYST",
+      "when": {
+        "severity_in": ["CRITICAL"]
+      },
+      "description": "Critical severity but the evidence does not meet the bar for an automated action: escalate to a human."
+    },
+    {
+      "id": "P-04",
+      "name": "High severity, strong evidence",
+      "action": "ALERT_ANALYST",
+      "when": {
+        "severity_in": ["HIGH"],
+        "min_confidence": 0.90,
+        "min_indicators": 3
+      },
+      "description": "High severity with strong evidence: a human decides, nothing is automated at this level."
+    },
+    {
+      "id": "P-05",
+      "name": "Early warning",
+      "action": "EARLY_WARNING",
+      "when": {
+        "predicted_next_stage_in": ["lateral_movement", "exfiltration", "impact"],
+        "min_confidence": 0.75
+      },
+      "description": "The sequence is predicted to reach a serious stage but no action threshold is met yet: warn the operator."
+    }
+  ],
+  "default": {
+    "action": "LOG_ONLY",
+    "description": "No policy rule matched; recorded for the audit trail only."
+  }
+}
